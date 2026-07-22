@@ -231,8 +231,9 @@
   .detail-field label{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:600; margin-bottom:5px; }
   .detail-field div{ font-size:13.5px; font-weight:500; }
 
-  .section-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .section-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:12px; flex-wrap:wrap; }
   .section-head h2{ font-family:var(--font-display); font-size:16px; font-weight:700; margin:0; }
+  .section-head-actions{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-left:auto; }
 
   .empty-state{
     background:var(--card); border:1px dashed var(--line-strong); border-radius:var(--radius);
@@ -370,6 +371,8 @@
     .appt-card{ flex-direction:column; }
     .appt-side{ align-items:flex-start; width:100%; }
     .pagination{ flex-direction:column; gap:12px; align-items:flex-start; }
+    .section-head-actions{ width:100%; }
+    .section-head-actions .btn{ flex:1; justify-content:center; }
   }
 </style>
 </head>
@@ -505,7 +508,21 @@
 
         <div class="section-head">
           <h2>Certificates</h2>
-          <button class="btn btn--primary btn--sm" onclick="goView('certificate')">+ Add Certificate</button>
+          <div class="section-head-actions">
+            <button class="btn btn--primary btn--sm" onclick="goView('certificate')">+ Add Certificate</button>
+            <button class="btn btn--ghost btn--sm" onclick="showToast('Job sheet generated')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>
+              Generate Job Sheet
+            </button>
+            <button class="btn btn--ghost btn--sm" onclick="showToast('Report generated')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>
+              Generate Report
+            </button>
+            <button class="btn btn--ghost btn--sm" onclick="showToast('Job sheet downloaded')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+              Download Job Sheet
+            </button>
+          </div>
         </div>
 
         <div class="empty-state">
