@@ -1,0 +1,1225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Indo Veritas Group — Redesign Demo</title>
+<style>
+  :root{
+    --navy:#004b73;
+    --navy-soft:#1B3A5C;
+    --navy-soft2:#28496E;
+    --paper:#F5F6F8;
+    --card:#FFFFFF;
+    --amber:#ffc107;
+    --amber-dark:#212529;
+    --teal:#28a745;
+    --teal-bg:#28a745;
+    --red:#C1503A;
+    --red-bg:#F8EAE6;
+    --line:#E2E5EA;
+    --line-strong:#CBD2DB;
+    --ink:#1A2332;
+    --muted:#64748B;
+    --radius:8px;
+    --font-display: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-body: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --shadow: 0 1px 2px rgba(16,36,62,0.06), 0 1px 0 rgba(16,36,62,0.04);
+    --shadow-md: 0 6px 20px rgba(16,36,62,0.10);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--font-body); font-size:14.5px; line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  button{font-family:inherit;}
+  input:focus, select:focus, textarea:focus, button:focus-visible, [tabindex]:focus-visible{
+    outline:2px solid var(--amber-dark); outline-offset:1px;
+  }
+
+  .app{ display:flex; min-height:100vh; }
+
+  /* ===== Sidebar ===== */
+  .sidebar{
+    width:236px; flex:none;
+    background:var(--navy);
+    color:#DCE6F0;
+    display:flex; flex-direction:column;
+    padding:20px 14px;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    padding:6px 8px 22px;
+    color:#fff;
+  }
+  .brand svg{ flex:none; }
+  .brand-text{ font-family:var(--font-display); font-weight:700; font-size:14.5px; line-height:1.25; }
+  .brand-text span{ display:block; font-size:10.5px; font-weight:500; color:var(--amber); letter-spacing:.06em; }
+
+  .nav{ display:flex; flex-direction:column; gap:2px; }
+  .nav-item{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 10px; border-radius:6px;
+    color:#B9C7D8; font-size:13.5px; font-weight:500;
+    cursor:pointer; border:none; background:none; text-align:left; width:100%;
+  }
+  .nav-item:hover{ background:rgba(255,255,255,0.06); color:#fff; }
+  .nav-item.active{ background:var(--navy-soft); color:#fff; }
+  .nav-item svg{ flex:none; opacity:.9; }
+
+  .sidebar-foot{ margin-top:auto; padding:10px 8px; font-size:11.5px; color:#5C7189; }
+
+  /* ===== Main ===== */
+  .main{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .topbar{
+    background:var(--card); border-bottom:1px solid var(--line);
+    padding:14px 28px; display:flex; align-items:center; justify-content:space-between;
+    gap:12px;
+  }
+  .topbar-left{ display:flex; align-items:center; gap:10px; min-width:0; }
+  .crumb{ font-size:13px; color:var(--muted); display:flex; align-items:center; gap:8px; }
+  .crumb b{ color:var(--ink); }
+  .topbar-right{ display:flex; align-items:center; gap:16px; }
+  .avatar{
+    width:30px;height:30px;border-radius:50%;
+    background:var(--navy-soft2); color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:600;font-family:var(--font-display);
+  }
+  .logout-link{ font-size:13px; color:var(--muted); cursor:pointer; }
+  .logout-link:hover{ color:var(--ink); }
+
+  /* Mobile menu button (hidden on desktop) */
+  .menu-btn{
+    display:none; align-items:center; justify-content:center;
+    width:34px; height:34px; border-radius:6px; border:1px solid var(--line-strong);
+    background:var(--card); color:var(--ink); cursor:pointer; flex:none; padding:0;
+  }
+  .menu-btn:hover{ border-color:var(--navy-soft2); }
+
+  /* Topbar logo (shown in place of breadcrumb text on mobile) */
+  .topbar-logo{ display:none; align-items:center; gap:8px; min-width:0; }
+  .topbar-logo svg{ flex:none; }
+  .topbar-logo-text{ font-family:var(--font-display); font-weight:700; font-size:14px; color:var(--navy); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* Sidebar overlay backdrop for mobile drawer */
+  .sidebar-overlay{
+    display:none; position:fixed; inset:0; background:rgba(16,24,40,0.45);
+    z-index:39; opacity:0; transition:opacity .2s ease;
+  }
+  .sidebar-overlay.active{ display:block; opacity:1; }
+
+  .content{ padding:26px 28px 60px; max-width:1180px; width:100%; margin:0 auto; }
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  .page-head{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px; gap:16px; flex-wrap:wrap; }
+  .page-head h1{ font-family:var(--font-display); font-size:21px; font-weight:700; margin:0 0 3px; }
+  .page-head p{ margin:0; color:var(--muted); font-size:13px; }
+
+  .btn{
+    font-family:var(--font-body); font-size:13.5px; font-weight:600;
+    padding:9px 16px; border-radius:6px; cursor:pointer; border:1px solid transparent;
+    display:inline-flex; align-items:center; gap:7px; white-space:nowrap;
+  }
+  .btn--primary{ background:var(--navy); color:#fff; }
+  .btn--primary:hover{ background:var(--navy-soft); }
+  .btn--ghost{ background:var(--card); color:var(--ink); border-color:var(--line-strong); }
+  .btn--ghost:hover{ border-color:var(--navy-soft2); }
+  .btn--sm{ padding:7px 12px; font-size:12.5px; }
+  .btn[disabled]{ opacity:.45; cursor:not-allowed; }
+
+  /* ===== Toolbar / filters ===== */
+  .toolbar{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+  .search-input{
+    position:relative; flex:1; min-width:220px;
+  }
+  .search-input input{
+    width:100%; padding:9px 34px 9px 34px; border:1px solid var(--line-strong);
+    border-radius:6px; font-size:13.5px; background:var(--card);
+  }
+  .search-input svg{ position:absolute; left:11px; top:50%; transform:translateY(-50%); opacity:.5; }
+  .search-input .clear-btn{
+    display:none; align-items:center; justify-content:center;
+    position:absolute; right:6px; top:50%; transform:translateY(-50%);
+    width:24px; height:24px; border:none; background:none; border-radius:5px;
+    color:var(--muted); cursor:pointer; padding:0;
+  }
+  .search-input .clear-btn:hover{ background:var(--paper); color:var(--ink); }
+  .search-input.has-value .clear-btn{ display:flex; }
+  .chip-row{ display:flex; gap:6px; }
+  .chip{
+    padding:7px 12px; border-radius:99px; border:1px solid var(--line-strong);
+    background:var(--card); font-size:12.5px; font-weight:500; color:var(--muted); cursor:pointer;
+  }
+  .chip.active{ background:var(--navy); border-color:var(--navy); color:#fff; }
+  .chip[data-filter="pending"].active{ background:#ffc107; border-color:#ffc107; color:var(--amber-dark); }
+  .chip[data-filter="issued"].active{ background:var(--teal-bg); border-color:var(--teal-bg); color:#fff; }
+  .date-input, .select-input{
+    padding:9px 10px; border:1px solid var(--line-strong); border-radius:6px; font-size:13px; color:var(--muted); background:var(--card);
+  }
+
+  /* ===== Appointment cards ===== */
+  .appt-container{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); overflow:hidden;
+  }
+  .appt-list{ display:flex; flex-direction:column; gap:10px; padding:16px; }
+  .appt-card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:16px 18px; display:flex; gap:16px; align-items:flex-start;
+    cursor:pointer; position:relative; overflow:hidden;
+  }
+  .appt-card:hover{ box-shadow:var(--shadow-md); border-color:var(--line-strong); }
+  .appt-card:before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--line-strong);
+  }
+  .appt-card.status-issued:before{ background:var(--teal); }
+  .appt-card.status-pending:before{ background:var(--amber); }
+  .appt-card-main{ flex:1; min-width:0; }
+  .appt-top-row{ display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap; }
+  .mono-chip{
+    font-family:var(--font-mono); font-size:11.5px; color:var(--navy-soft2);
+    background:#EEF3F9; padding:2px 8px; border-radius:5px; letter-spacing:.01em;
+  }
+  .status-pill{
+    font-size:11px; font-weight:600; padding:3px 9px; border-radius:99px;
+  }
+  .status-pill.issued{ background:var(--teal-bg); color:#fff; }
+  .status-pill.pending{ background:#ffc107; color:var(--amber-dark); }
+  .appt-client{ font-family:var(--font-display); font-size:15.5px; font-weight:700; margin:2px 0 4px; }
+  .appt-scope{ font-size:13px; color:var(--muted); margin:0 0 10px; max-width:640px; }
+  .appt-scope .more{ color:var(--navy-soft2); font-weight:600; cursor:pointer; }
+  .appt-meta{ display:flex; align-items:center; gap:16px; font-size:12.5px; color:var(--muted); flex-wrap:wrap; }
+  .appt-meta span{ display:flex; align-items:center; gap:5px; }
+  .personnel-chips{ display:flex; gap:-6px; }
+  .p-chip{
+    width:22px;height:22px;border-radius:50%; background:var(--navy-soft2); color:#fff;
+    font-size:10px; font-weight:700; display:flex;align-items:center;justify-content:center;
+    border:2px solid var(--card); margin-left:-6px; font-family:var(--font-display);
+  }
+  .p-chip:first-child{ margin-left:0; }
+
+  .appt-side{ display:flex; flex-direction:column; align-items:flex-end; gap:10px; flex:none; }
+  .appt-when{ text-align:right; font-size:12px; color:var(--muted); font-family:var(--font-mono); }
+  .appt-actions{ display:flex; gap:8px; }
+
+  /* ===== Detail view ===== */
+  .back-link{ display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--muted); cursor:pointer; margin-bottom:16px; }
+  .back-link:hover{ color:var(--ink); }
+  .detail-card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:24px; margin-bottom:22px;
+  }
+  .detail-head{ display:flex; align-items:flex-start; gap:14px; margin-bottom:14px; }
+  .detail-icon{
+    width:40px;height:40px;border-radius:8px; background:#EEF3F9; color:var(--navy-soft2);
+    display:flex;align-items:center;justify-content:center; flex:none;
+  }
+  .detail-code{ font-family:var(--font-mono); font-size:12px; color:var(--muted); margin-bottom:2px; }
+  .detail-title{ font-family:var(--font-display); font-size:18px; font-weight:700; }
+  .detail-scope{ font-size:13.5px; color:var(--ink); border-top:1px solid var(--line); padding-top:14px; margin-top:14px; line-height:1.6; }
+  .detail-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:18px; padding-top:18px; border-top:1px solid var(--line);
+  }
+  .detail-field label{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:600; margin-bottom:5px; }
+  .detail-field div{ font-size:13.5px; font-weight:500; }
+
+  .section-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .section-head h2{ font-family:var(--font-display); font-size:16px; font-weight:700; margin:0; }
+
+  .empty-state{
+    background:var(--card); border:1px dashed var(--line-strong); border-radius:var(--radius);
+    padding:44px 24px; text-align:center; color:var(--muted);
+  }
+  .empty-state svg{ margin-bottom:12px; opacity:.55; }
+  .empty-state p{ margin:0 0 16px; font-size:13.5px; }
+
+  /* ===== Certificate wizard ===== */
+  .stepper-wrap{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:0 20px; margin-bottom:20px; }
+  .stepper{ display:flex; list-style:none; padding:0; margin:0; }
+  .stepper li{ flex:1; position:relative; padding:16px 4px 14px 0; cursor:pointer; }
+  .stepper li:not(:last-child):after{
+    content:""; position:absolute; top:27px; right:-4px; width:calc(100% - 24px); height:2px;
+    background:var(--line-strong); z-index:0;
+  }
+  .stepper li.done:not(:last-child):after{ background:var(--teal); }
+  .step-badge{ display:flex; align-items:center; gap:9px; }
+  .step-num{
+    width:22px;height:22px;border-radius:50%; border:2px solid var(--line-strong);
+    display:flex;align-items:center;justify-content:center; font-family:var(--font-mono); font-size:11px;
+    background:var(--card); color:var(--muted); position:relative; z-index:1; flex:none;
+  }
+  .stepper li.active .step-num{ border-color:var(--navy); background:var(--navy); color:#fff; }
+  .stepper li.done .step-num{ border-color:var(--teal); background:var(--teal); color:#fff; }
+  .step-label{ font-size:12.5px; font-weight:500; color:var(--muted); }
+  .stepper li.active .step-label{ color:var(--ink); font-weight:600; }
+  .stepper li.done .step-label{ color:var(--teal); }
+
+  .cert-step { display: none; }
+  .cert-step.active { display: block; }
+
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:22px; margin-bottom:16px; }
+  .field-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px 20px; }
+  .field{ display:flex; flex-direction:column; gap:5px; }
+  .field.span-2{ grid-column:1/-1; }
+  label{ font-size:13px; font-weight:600; color:var(--ink); }
+  .req{ color:var(--red); }
+  .helper{ font-size:12px; color:var(--muted); line-height:1.45; margin:0; }
+  .example{ font-size:12px; color:var(--muted); font-style:italic; background:var(--paper); border-radius:5px; padding:6px 9px; margin-top:2px; }
+  input[type=text], input[type=date], select, textarea{
+    font-family:var(--font-body); font-size:13.5px; padding:9px 10px; border:1px solid var(--line-strong);
+    border-radius:6px; background:var(--card); color:var(--ink); width:100%;
+  }
+  input[readonly]{ background:var(--paper); color:var(--muted); font-family:var(--font-mono); }
+  textarea{ resize:vertical; min-height:70px; }
+  .unit-field{ display:flex; gap:8px; }
+  .unit-field select{ max-width:110px; }
+
+  .input-error{ border-color:var(--red) !important; }
+  .rte.input-error{ border-color:var(--red); }
+  .field-error-msg{ font-size:11.5px; color:var(--red); margin:2px 0 0; display:none; }
+  .field-error-msg.show{ display:block; }
+
+  .rte{ border:1px solid var(--line-strong); border-radius:6px; overflow:hidden; }
+  .rte-toolbar{ display:flex; gap:2px; padding:6px 8px; border-bottom:1px solid var(--line); background:var(--paper); }
+  .rte-toolbar button{
+    width:26px;height:26px; border:none; background:none; border-radius:4px; cursor:pointer; color:var(--ink); font-size:13px; font-weight:700;
+  }
+  .rte-toolbar button:hover{ background:var(--line); }
+  .rte-toolbar button.u{ text-decoration:underline; }
+  .rte-body{ padding:10px 12px; min-height:90px; font-size:13.5px; outline:none; }
+  .rte-body[data-empty="true"]:before{ content: attr(data-placeholder); color:var(--muted); }
+
+  .review-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px 24px; }
+  .review-item{ padding:10px 0; border-bottom:1px solid var(--line); }
+  .review-item label{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:600; margin-bottom:3px; }
+  .review-item div{ font-size:13.5px; }
+
+  .footer-nav{
+    position:sticky; bottom:0; background:var(--card); border-top:1px solid var(--line);
+    padding:14px 0; display:flex; justify-content:space-between; align-items:center; margin-top:8px;
+  }
+
+  /* ===== Clients & Table styles ===== */
+  .table-card{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+  table.clients{ width:100%; border-collapse:collapse; }
+  table.clients th{
+    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted);
+    font-weight:600; padding:12px 18px; border-bottom:1px solid var(--line); background:var(--paper);
+  }
+  table.clients td{ padding:13px 18px; border-bottom:1px solid var(--line); font-size:13.5px; vertical-align:middle; }
+  table.clients tr:last-child td{ border-bottom:none; }
+  table.clients tr:hover td{ background:#FAFBFC; }
+  .client-name-cell{ display:flex; align-items:center; gap:10px; }
+  .client-avatar{
+    width:28px;height:28px;border-radius:50%; background:var(--navy-soft2); color:#fff;
+    display:flex;align-items:center;justify-content:center; font-size:11px; font-weight:700; font-family:var(--font-display); flex:none;
+  }
+  .muted-italic{ color:var(--muted); font-style:italic; }
+  .mono-cell{ font-family:var(--font-mono); font-size:12.5px; color:var(--muted); }
+
+  /* ===== Pagination Styling ===== */
+  .pagination{ display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-top:1px solid var(--line); background:var(--card); }
+  .pagination-left{ display:flex; align-items:center; gap:12px; font-size:12.5px; color:var(--muted); }
+  .page-size-selector{ display:flex; align-items:center; gap:6px; }
+  .page-size-selector select{ padding:4px 8px; font-size:12px; width:auto; }
+  .pagination-controls{ display:flex; gap:4px; align-items:center; }
+  .page-btn{
+    min-width:30px; height:30px; padding:0 6px; border:1px solid var(--line); background:var(--card); border-radius:6px;
+    font-size:12.5px; cursor:pointer; color:var(--muted); display:inline-flex; align-items:center; justify-content:center;
+  }
+  .page-btn.active{ background:var(--navy); border-color:var(--navy); color:#fff; font-weight:600; }
+  .page-btn:hover:not(.active):not([disabled]){ border-color:var(--line-strong); color:var(--ink); }
+  .page-btn[disabled]{ opacity:0.4; cursor:not-allowed; }
+
+  .toast-stack{ position:fixed; bottom:24px; right:24px; display:flex; flex-direction:column; gap:8px; z-index:50; }
+  .toast{
+    background:var(--navy); color:#fff; padding:11px 16px; border-radius:6px; font-size:13px;
+    display:flex; align-items:center; gap:9px; box-shadow:var(--shadow-md); max-width:320px;
+    animation:toast-in .2s ease;
+  }
+  .toast.ok:before{ content:"✓"; color:#7FD8C0; font-weight:700; }
+  @keyframes toast-in{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  .before-tag{
+    font-family:var(--font-mono); font-size:10.5px; color:var(--amber-dark); background:#FCF1DF;
+    border:1px solid #F0D8AC; padding:2px 8px; border-radius:99px; margin-left:8px;
+  }
+
+  @media (max-width:900px){
+    .field-grid, .review-grid, .detail-grid{ grid-template-columns:1fr; }
+
+    .sidebar{
+      position:fixed; top:0; left:0; bottom:0; z-index:40;
+      transform:translateX(-100%); transition:transform .22s ease;
+      box-shadow:2px 0 24px rgba(16,24,40,0.25);
+    }
+    .sidebar.open{ transform:translateX(0); }
+
+    .menu-btn{ display:inline-flex; }
+    .topbar-logo{ display:flex; }
+    .crumb{ display:none; }
+
+    .appt-card{ flex-direction:column; }
+    .appt-side{ align-items:flex-start; width:100%; }
+    .pagination{ flex-direction:column; gap:12px; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 6v6c0 5 3.8 8.7 9 10 5.2-1.3 9-5 9-10V6l-9-4z" fill="#E8A33D"/><path d="M12 2L3 6v6c0 5 3.8 8.7 9 10V2z" fill="#fff" opacity=".18"/></svg>
+      <div class="brand-text">Indo Veritas<span>GROUP</span></div>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" data-nav="appointments">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+        Service Appointments
+      </button>
+      <button class="nav-item" data-nav="clients">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><circle cx="18" cy="9" r="2.4"/><path d="M15.5 14.2c2.7.5 4.5 2.4 4.5 4.8"/></svg>
+        Clients
+      </button>
+    </nav>
+    <div class="sidebar-foot">v2 · UI/UX redesign preview</div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+        <div class="crumb" id="crumb"><b>32 appointments · 11 awaiting certificate · 21 issued</b></div>
+        <div class="topbar-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 6v6c0 5 3.8 8.7 9 10 5.2-1.3 9-5 9-10V6l-9-4z" fill="#004b73"/><path d="M12 2L3 6v6c0 5 3.8 8.7 9 10V2z" fill="#E8A33D" opacity=".55"/></svg>
+          <span class="topbar-logo-text">Indo Veritas Group</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="logout-link">Logout</span>
+        <div class="avatar">MF</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- VIEW: APPOINTMENTS LIST -->
+      <section class="view active" data-view="appointments">
+        <div class="page-head">
+          <div>
+            <h1>Service Appointments</h1>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-input">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input type="text" id="apptSearch" placeholder="Search by client, code, or scope of work" oninput="onApptFilterChange()">
+            <button type="button" class="clear-btn" aria-label="Clear search" onclick="clearApptSearch()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="chip-row">
+            <button class="chip active" data-filter="all" onclick="setApptFilter('all', this)">All</button>
+            <button class="chip" data-filter="pending" onclick="setApptFilter('pending', this)">Awaiting certificate</button>
+            <button class="chip" data-filter="issued" onclick="setApptFilter('issued', this)">Certificate issued</button>
+          </div>
+          
+          <!-- Sort Selector -->
+          <select class="select-input" id="apptSortSelect" onchange="onApptFilterChange()">
+            <option value="date-desc">Sort: Schedule (Newest to Oldest)</option>
+            <option value="date-asc">Sort: Schedule (Oldest to Newest)</option>
+            <option value="client-asc">Sort: Client (A–Z)</option>
+            <option value="client-desc">Sort: Client (Z–A)</option>
+          </select>
+
+          <input class="date-input" type="text" id="apptStartDate" placeholder="Start date" onfocus="(this.type='date')" onchange="onApptFilterChange()">
+          <input class="date-input" type="text" id="apptEndDate" placeholder="End date" onfocus="(this.type='date')" onchange="onApptFilterChange()">
+        </div>
+
+        <!-- Appointment Cards List wrapped with Pagination Container -->
+        <div class="appt-container">
+          <div class="appt-list" id="apptList"></div>
+          
+          <!-- Service Appointments Pagination Controls -->
+          <div class="pagination">
+            <div class="pagination-left">
+              <span id="apptPaginationInfo">Showing 1–5 of 32</span>
+              <div class="page-size-selector">
+                <label for="apptPageSizeSelect">Show:</label>
+                <select id="apptPageSizeSelect" onchange="changeApptPageSize(this.value)">
+                  <option value="5" selected>5</option>
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="all">All</option>
+                </select>
+              </div>
+            </div>
+            <div class="pagination-controls" id="apptPageControls"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: APPOINTMENT DETAIL -->
+      <section class="view" data-view="detail">
+        <span class="back-link" onclick="goView('appointments')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          Back to Service Appointments
+        </span>
+
+        <div class="detail-card">
+          <div class="detail-head">
+            <div class="detail-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+            </div>
+            <div>
+              <div class="detail-code">IVG.10/WOD/26/VII/25</div>
+              <div class="detail-title">PT. Akura Bina Citra</div>
+            </div>
+          </div>
+          <div class="detail-scope">
+            SO-IVG2026070030 — Explosive Bunker Primary (Sling, Shackle), Explosive Bunker Secondary (Sling, Shackle), Fishing Box (Sling, Shackle), Radioactive Bunker (Sling, Shackle), Doghouse (Sling, Shackle), Rig Up Equipment (Tie Down Chain, T‑Bar, Tool Clamp, Make‑Up Stand, Loadcell, Lifting Clamp), Slings/Belts, Safety Harness.
+          </div>
+          <div class="detail-grid">
+            <div class="detail-field"><label>Schedule</label><div>Tue, 21 Jul 2026 · 15:01 – 08:34</div></div>
+            <div class="detail-field"><label>Personnel</label><div>Muhamad Farhan</div></div>
+            <div class="detail-field"><label>Status</label><div><span class="status-pill pending">Awaiting certificate</span></div></div>
+          </div>
+        </div>
+
+        <div class="section-head">
+          <h2>Certificates</h2>
+          <button class="btn btn--primary btn--sm" onclick="goView('certificate')">+ Add Certificate</button>
+        </div>
+
+        <div class="empty-state">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>
+          <p>No certificates yet for this appointment.<br>Create one to generate the inspection report.</p>
+          <button class="btn btn--primary" onclick="goView('certificate')">+ Create first certificate</button>
+        </div>
+      </section>
+
+      <!-- VIEW: CERTIFICATE WIZARD -->
+      <section class="view" data-view="certificate">
+        <span class="back-link" onclick="goView('detail')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          Back to appointment
+        </span>
+        <div class="page-head">
+          <div>
+            <h1>Certificate <span class="before-tag">4 focused steps · was 1 long scroll</span></h1>
+            <p>IVG.10/WOD/26/VII/25 · PT. Akura Bina Citra</p>
+          </div>
+        </div>
+
+        <div class="stepper-wrap">
+          <ul class="stepper" id="certStepper">
+            <li class="active" data-step="1"><div class="step-badge"><span class="step-num">1</span><span class="step-label">Report Details</span></div></li>
+            <li data-step="2"><div class="step-badge"><span class="step-num">2</span><span class="step-label">Equipment</span></div></li>
+            <li data-step="3"><div class="step-badge"><span class="step-num">3</span><span class="step-label">Load &amp; Specs</span></div></li>
+            <li data-step="4"><div class="step-badge"><span class="step-num">4</span><span class="step-label">Review &amp; Generate</span></div></li>
+          </ul>
+        </div>
+
+        <!-- STEP 1 -->
+        <div class="cert-step active" data-cert-step="1">
+          <div class="card">
+            <div class="field-grid">
+              <div class="field">
+                <label>Date of thorough examination <span class="req">*</span></label>
+                <input type="date" value="2026-07-21" required>
+              </div>
+              <div class="field">
+                <label>Date of report <span class="req">*</span></label>
+                <input type="date" value="2026-07-21" required>
+              </div>
+              <div class="field">
+                <label>Report number</label>
+                <input type="text" value="IVG.10/WOD/26/VII/25" readonly>
+                <p class="helper">Generated automatically from the appointment code.</p>
+              </div>
+              <div class="field span-2">
+                <label>Name and address of employer <span class="req">*</span></label>
+                <p class="helper">The customer or company that requested this inspection.</p>
+                <textarea placeholder="e.g. PT. Akura Bina Citra&#10;Gedung 123 Jalan XYZ No.1, Kota Jakarta" required></textarea>
+              </div>
+              <div class="field span-2">
+                <label>Address of premises where examination was made <span class="req">*</span></label>
+                <p class="helper">The site or warehouse where the equipment was physically inspected.</p>
+                <textarea placeholder="e.g. Warehouse PT XYZ, Bekasi" required></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="cert-step" data-cert-step="2">
+          <div class="card">
+            <div class="field-grid">
+              <div class="field span-2">
+                <label>Description and identification of the equipment <span class="req">*</span></label>
+                <p class="helper">Include equipment type, manufacturer, model, capacity and serial number.</p>
+                <div class="rte">
+                  <div class="rte-toolbar">
+                    <button type="button" onclick="document.execCommand('bold')"><b>B</b></button>
+                    <button type="button" onclick="document.execCommand('italic')"><i>I</i></button>
+                    <button type="button" class="u" onclick="document.execCommand('underline')">U</button>
+                  </div>
+                  <div class="rte-body" contenteditable="true" data-placeholder="Mobile Crane — Manufacturer: XXX, Model: XXX, Max Capacity: XXX, Serial Number: XXX" data-empty="true"></div>
+                </div>
+                <p class="example">Example: Mobile Crane · Manufacturer: XXX · Model: XXX · Max Capacity: XXX · Serial Number: XXX</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="cert-step" data-cert-step="3">
+          <div class="card">
+            <div class="field-grid">
+              <div class="field">
+                <label>Safe working load <span class="req">*</span></label>
+                <div class="unit-field">
+                  <input type="text" placeholder="e.g. 10" required>
+                  <select><option>tonne</option><option>kg</option><option>lbs</option></select>
+                </div>
+              </div>
+              <div class="field">
+                <label>Date of manufacture <span class="req">*</span></label>
+                <input type="date" value="2026-07-21" required>
+              </div>
+              <div class="field">
+                <label>Serial number</label>
+                <input type="text" placeholder="e.g. YN15T19008">
+              </div>
+              <div class="field">
+                <label>Max lifting capacity</label>
+                <input type="text" placeholder="e.g. 8000 kg">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4 -->
+        <div class="cert-step" data-cert-step="4">
+          <div class="card">
+            <div class="prefill-note" style="font-size:12px;color:var(--muted);background:var(--paper);border-radius:6px;padding:9px 12px;margin-bottom:14px;">
+              Review the details below before generating the certificate. You can go back to any step to make changes.
+            </div>
+            <div class="review-grid">
+              <div class="review-item"><label>Report number</label><div>IVG.10/WOD/26/VII/25</div></div>
+              <div class="review-item"><label>Date of examination</label><div>21 July 2026</div></div>
+              <div class="review-item"><label>Employer</label><div>PT. Akura Bina Citra</div></div>
+              <div class="review-item"><label>Premises</label><div>Warehouse PT XYZ, Bekasi</div></div>
+              <div class="review-item"><label>Safe working load</label><div id="reviewSWL">—</div></div>
+              <div class="review-item"><label>Date of manufacture</label><div>21 July 2026</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-nav">
+          <button class="btn btn--ghost" id="certBack" disabled>Back</button>
+          <button class="btn btn--primary" id="certNext">Continue</button>
+        </div>
+      </section>
+
+      <!-- VIEW: CLIENTS -->
+      <section class="view" data-view="clients">
+        <div class="page-head">
+          <div>
+            <h1>Clients</h1>
+            <p id="totalClientsLabel">65 clients</p>
+          </div>
+          <button class="btn btn--primary btn--sm">+ Add client</button>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-input">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input type="text" id="clientSearch" placeholder="Search clients by name or company" oninput="onClientFilterChange()">
+            <button type="button" class="clear-btn" aria-label="Clear search" onclick="clearClientSearch()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <table class="clients">
+            <thead><tr><th>Client</th><th>Company</th><th>Email</th><th>Phone</th></tr></thead>
+            <tbody id="clientsBody"></tbody>
+          </table>
+          <div class="pagination">
+            <div class="pagination-left">
+              <span id="paginationInfo">Showing 1–10 of 65</span>
+              <div class="page-size-selector">
+                <label for="pageSizeSelect">Show:</label>
+                <select id="pageSizeSelect" onchange="changePageSize(this.value)">
+                  <option value="10" selected>10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="all">All</option>
+                </select>
+              </div>
+            </div>
+            <div class="pagination-controls" id="pageControls"></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+
+<script>
+// ---------- Nav / view switching ----------
+const crumbTitles = { detail:'Service Appointments <span style="opacity:.4">/</span> Appointment Details', certificate:'Service Appointments <span style="opacity:.4">/</span> Certificate' };
+let apptSummaryText = '';
+let clientSummaryText = '';
+function goView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view === name));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.nav === (name==='detail'||name==='certificate' ? 'appointments' : name)));
+  if(name === 'appointments'){
+    document.getElementById('crumb').innerHTML = '<b>' + apptSummaryText + '</b>';
+  } else if(name === 'clients'){
+    document.getElementById('crumb').innerHTML = '<b>' + clientSummaryText + '</b>';
+  } else {
+    document.getElementById('crumb').innerHTML = '<b>' + crumbTitles[name] + '</b>';
+  }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.querySelectorAll('.nav-item').forEach(n => n.addEventListener('click', () => { goView(n.dataset.nav); closeMobileMenu(); }));
+
+// ---------- Mobile sidebar drawer ----------
+const sidebarEl = document.querySelector('.sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const menuBtn = document.getElementById('menuBtn');
+
+function openMobileMenu(){
+  sidebarEl.classList.add('open');
+  sidebarOverlay.classList.add('active');
+}
+function closeMobileMenu(){
+  sidebarEl.classList.remove('open');
+  sidebarOverlay.classList.remove('active');
+}
+menuBtn.addEventListener('click', openMobileMenu);
+sidebarOverlay.addEventListener('click', closeMobileMenu);
+
+// ---------- Toasts ----------
+function showToast(msg){
+  const stack = document.getElementById('toastStack');
+  const el = document.createElement('div');
+  el.className = 'toast ok';
+  el.textContent = msg;
+  stack.appendChild(el);
+  setTimeout(() => { el.style.opacity='0'; el.style.transition='opacity .25s'; setTimeout(()=>el.remove(),250); }, 2600);
+}
+
+// ---------- Appointments Dataset ----------
+const baseAppts = [
+  { code:'IVG.10/WOD/26/VII/25', client:'PT. Akura Bina Citra', scope:'SO-IVG2026070030 — Explosive Bunker Primary, Secondary, Fishing Box, Radioactive Bunker, Doghouse, Rig Up Equipment, Slings/Belts, Safety Harness', when:'Tue, 21 Jul 2026 · 15:01–08:34', personnel:['MF'], status:'pending' },
+  { code:'IVG.10/WOD/26/VII/24', client:'PT. Gunanusa Utama Fabricators', scope:'SO-IVG2026070029 — Recertification of air reservoir tank (pressure vessel), load test skid/frame of the reservoir tank', when:'Tue, 21 Jul 2026 · 08:14', personnel:['AN'], status:'pending' },
+  { code:'IVG.10/WOD/26/VII/19', client:'PT. Nusa Halmahera Minerals', scope:'3rd Party Inspection — Main Rope & Guide Rope (Visual, NDT)', when:'Fri, 17 Jul 2026 · 14:43', personnel:['IS','AZ'], status:'issued' },
+  { code:'IVG.10/WOD/26/VII/23', client:'PT. Meindo Elang Indah', scope:'DISNAKER Certification for Excavator Standard Arm MEI-EXC-075 SN YN15T19008', when:'Fri, 17 Jul 2026 · 13:05–15:43', personnel:['MF','AN'], status:'issued' },
+  { code:'IVG.10/WOD/26/VII/21', client:'PT. Oil Spill Combat Team', scope:'Periodic Inspection — Sling Set cw Shackle 4 Leg Wirerope Sling w/Shackle 5/8"', when:'Fri, 17 Jul 2026 · 10:21', personnel:['IK'], status:'pending' },
+  { code:'IVG.10/WOD/26/VII/20', client:'PT. HYDROCORE', scope:'Inspection — Daily Rate (Wire Rope Sling 26 EA, Shackle 12 EA)', when:'Fri, 17 Jul 2026 · 10:06', personnel:['IK','AN'], status:'issued' },
+];
+
+// Expand dataset to 32 items to demonstrate full pagination
+const appts = [];
+for (let i = 0; i < 32; i++) {
+  const base = baseAppts[i % baseAppts.length];
+  const day = 21 - Math.floor(i / 2);
+  const monthStr = 'Jul 2026';
+  const hour = String(15 - (i % 8)).padStart(2, '0');
+  appts.push({
+    code: `IVG.10/WOD/26/VII/${String(25 - i).padStart(2, '0')}`,
+    client: `${base.client}${i > 5 ? ` (Branch ${Math.floor(i/5)})` : ''}`,
+    scope: base.scope,
+    when: `Wed, ${day} ${monthStr} · ${hour}:00`,
+    personnel: base.personnel,
+    status: i % 3 === 0 ? 'pending' : 'issued'
+  });
+}
+
+// Helper: parse date from schedule string for accurate sorting
+function parseScheduleDate(whenStr) {
+  try {
+    const match = whenStr.match(/(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})\s*·\s*(\d{2}):(\d{2})/);
+    if (!match) return new Date(0);
+    const [, day, monthStr, year, hour, min] = match;
+    const months = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 };
+    return new Date(year, months[monthStr] || 0, day, hour, min);
+  } catch(e) {
+    return new Date(0);
+  }
+}
+
+// Appointment Pagination state
+let currentApptPage = 1;
+let apptPageSize = 5;
+let currentApptFilter = 'all';
+
+function setApptFilter(filter, btn) {
+  document.querySelectorAll('.chip-row .chip').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+  currentApptFilter = filter;
+  currentApptPage = 1;
+  renderAppointments();
+}
+
+function onApptFilterChange() {
+  currentApptPage = 1;
+  toggleClearBtn('apptSearch');
+  renderAppointments();
+}
+
+function clearApptSearch(){
+  const input = document.getElementById('apptSearch');
+  input.value = '';
+  onApptFilterChange();
+  input.focus();
+}
+
+function toggleClearBtn(inputId){
+  const input = document.getElementById(inputId);
+  input.parentElement.classList.toggle('has-value', input.value.length > 0);
+}
+
+function changeApptPageSize(val) {
+  apptPageSize = val;
+  currentApptPage = 1;
+  renderAppointments();
+}
+
+function toggleScope(e, el){
+  e.stopPropagation();
+  const p = el.parentElement;
+  const appt = appts.find(a => a.code === p.dataset.code);
+  if(!appt) return;
+  const expanded = p.dataset.expanded === 'true';
+  if(expanded){
+    p.dataset.expanded = 'false';
+    p.innerHTML = `${appt.scope.slice(0,110)}… <span class="more" onclick="toggleScope(event,this)">Show more</span>`;
+  } else {
+    p.dataset.expanded = 'true';
+    p.innerHTML = `${appt.scope} <span class="more" onclick="toggleScope(event,this)">Show less</span>`;
+  }
+}
+
+function renderAppointments() {
+  const list = document.getElementById('apptList');
+  list.innerHTML = '';
+
+  const searchVal = document.getElementById('apptSearch').value.toLowerCase().trim();
+  const sortVal = document.getElementById('apptSortSelect').value;
+  const startVal = document.getElementById('apptStartDate').value;
+  const endVal = document.getElementById('apptEndDate').value;
+
+  // Filter
+  let filtered = appts.filter(a => {
+    const matchesFilter = currentApptFilter === 'all' || a.status === currentApptFilter;
+    const matchesSearch = !searchVal || 
+      a.client.toLowerCase().includes(searchVal) || 
+      a.code.toLowerCase().includes(searchVal) || 
+      a.scope.toLowerCase().includes(searchVal);
+    let matchesDate = true;
+    if (startVal || endVal) {
+      const apptDate = parseScheduleDate(a.when);
+      const apptDateOnly = new Date(apptDate.getFullYear(), apptDate.getMonth(), apptDate.getDate());
+      if (startVal) matchesDate = matchesDate && apptDateOnly >= new Date(startVal + 'T00:00:00');
+      if (endVal) matchesDate = matchesDate && apptDateOnly <= new Date(endVal + 'T00:00:00');
+    }
+    return matchesFilter && matchesSearch && matchesDate;
+  });
+
+  // Update summary header label
+  const pendingCount = appts.filter(a => a.status === 'pending').length;
+  const issuedCount = appts.filter(a => a.status === 'issued').length;
+  apptSummaryText = `${appts.length} appointments · ${pendingCount} awaiting certificate · ${issuedCount} issued`;
+  if(document.querySelector('.view.active')?.dataset.view === 'appointments'){
+    document.getElementById('crumb').innerHTML = '<b>' + apptSummaryText + '</b>';
+  }
+
+  // Sort
+  filtered.sort((a, b) => {
+    if (sortVal === 'date-desc') return parseScheduleDate(b.when) - parseScheduleDate(a.when);
+    if (sortVal === 'date-asc') return parseScheduleDate(a.when) - parseScheduleDate(b.when);
+    if (sortVal === 'client-asc') return a.client.localeCompare(b.client);
+    if (sortVal === 'client-desc') return b.client.localeCompare(a.client);
+    return 0;
+  });
+
+  const total = filtered.length;
+  const effSize = apptPageSize === 'all' ? total : parseInt(apptPageSize);
+  const totalPages = apptPageSize === 'all' ? 1 : Math.ceil(total / effSize) || 1;
+
+  if (currentApptPage > totalPages) currentApptPage = totalPages;
+  if (currentApptPage < 1) currentApptPage = 1;
+
+  const startIdx = (currentApptPage - 1) * effSize;
+  const endIdx = apptPageSize === 'all' ? total : Math.min(startIdx + effSize, total);
+
+  const visibleAppts = filtered.slice(startIdx, endIdx);
+
+  if (visibleAppts.length === 0) {
+    list.innerHTML = `
+      <div style="padding: 30px; text-align: center; color: var(--muted); font-size: 13.5px;">
+        No service appointments found matching your criteria.
+      </div>
+    `;
+  } else {
+    visibleAppts.forEach(a => {
+      const div = document.createElement('div');
+      div.className = 'appt-card status-' + a.status;
+      div.onclick = () => goView('detail');
+      div.innerHTML = `
+        <div class="appt-card-main">
+          <div class="appt-top-row">
+            <span class="mono-chip">${a.code}</span>
+            <span class="status-pill ${a.status}">${a.status === 'issued' ? 'Certificate issued' : 'Awaiting certificate'}</span>
+          </div>
+          <div class="appt-client">${a.client}</div>
+          <p class="appt-scope" data-code="${a.code}" data-expanded="false">${a.scope.slice(0,110)}${a.scope.length>110 ? '… <span class="more" onclick="toggleScope(event,this)">Show more</span>' : ''}</p>
+          <div class="appt-meta">
+            <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>${a.when}</span>
+            <span class="personnel-chips">${a.personnel.map(p=>`<span class="p-chip">${p}</span>`).join('')}</span>
+          </div>
+        </div>
+        <div class="appt-side" onclick="event.stopPropagation()">
+          <div class="appt-actions">
+            <button class="btn btn--ghost btn--sm" onclick="showToast('QR code generated')">QR Code</button>
+            <button class="btn btn--primary btn--sm" onclick="goView('certificate')">${a.status==='issued' ? 'View Certificate' : 'Create Certificate'}</button>
+          </div>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  // Update Pagination Info
+  document.getElementById('apptPaginationInfo').textContent = total > 0 
+    ? `Showing ${startIdx + 1}–${endIdx} of ${total}` 
+    : 'No appointments to display';
+
+  renderApptPaginationControls(totalPages);
+}
+
+function renderApptPaginationControls(totalPages) {
+  const pc = document.getElementById('apptPageControls');
+  pc.innerHTML = '';
+
+  if (totalPages <= 1) return;
+
+  // Previous
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'page-btn';
+  prevBtn.textContent = '‹';
+  prevBtn.disabled = currentApptPage === 1;
+  prevBtn.onclick = () => { if(currentApptPage > 1) { currentApptPage--; renderAppointments(); } };
+  pc.appendChild(prevBtn);
+
+  // Pages
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || (i >= currentApptPage - 1 && i <= currentApptPage + 1)) {
+      const pageBtn = document.createElement('button');
+      pageBtn.className = `page-btn ${i === currentApptPage ? 'active' : ''}`;
+      pageBtn.textContent = i;
+      pageBtn.onclick = () => { currentApptPage = i; renderAppointments(); };
+      pc.appendChild(pageBtn);
+    } else if (
+      (i === 2 && currentApptPage > 3) || 
+      (i === totalPages - 1 && currentApptPage < totalPages - 2)
+    ) {
+      const ellipsis = document.createElement('span');
+      ellipsis.style.cssText = 'padding:0 2px;color:var(--muted);font-size:12px;';
+      ellipsis.textContent = '…';
+      pc.appendChild(ellipsis);
+    }
+  }
+
+  // Next
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'page-btn';
+  nextBtn.textContent = '›';
+  nextBtn.disabled = currentApptPage === totalPages;
+  nextBtn.onclick = () => { if(currentApptPage < totalPages) { currentApptPage++; renderAppointments(); } };
+  pc.appendChild(nextBtn);
+}
+
+renderAppointments();
+
+// ---------- Certificate wizard ----------
+const certSteps = [...document.querySelectorAll('.cert-step')];
+const certStepperItems = [...document.querySelectorAll('#certStepper li')];
+const certBack = document.getElementById('certBack');
+const certNext = document.getElementById('certNext');
+let cCurrent = 1;
+let furthestStep = 1;
+
+function validateCurrentStep(){
+  const stepEl = document.querySelector(`[data-cert-step="${cCurrent}"]`);
+  if(!stepEl) return true;
+  let valid = true;
+  let firstInvalid = null;
+
+  stepEl.querySelectorAll('input[required], textarea[required]').forEach(el => {
+    if(!el.value || !el.value.trim()){
+      valid = false;
+      el.classList.add('input-error');
+      if(!firstInvalid) firstInvalid = el;
+    } else {
+      el.classList.remove('input-error');
+    }
+  });
+
+  const rte = stepEl.querySelector('.rte-body');
+  if(rte){
+    const rteWrap = rte.closest('.rte');
+    if(rte.textContent.trim() === ''){
+      valid = false;
+      rteWrap.classList.add('input-error');
+      if(!firstInvalid) firstInvalid = rte;
+    } else {
+      rteWrap.classList.remove('input-error');
+    }
+  }
+
+  if(!valid){
+    showToast('Please fill in the required fields before continuing');
+    if(firstInvalid) firstInvalid.focus();
+  }
+  return valid;
+}
+
+function renderCert(){
+  certSteps.forEach(s => s.classList.toggle('active', +s.dataset.certStep === cCurrent));
+  certStepperItems.forEach(s => {
+    const n = +s.dataset.step;
+    s.classList.toggle('active', n === cCurrent);
+    s.classList.toggle('done', n < cCurrent);
+    s.style.opacity = n <= furthestStep ? '1' : '.5';
+    s.style.cursor = n <= furthestStep ? 'pointer' : 'not-allowed';
+  });
+  certBack.disabled = cCurrent === 1;
+  certNext.textContent = cCurrent === 4 ? 'Generate certificate' : 'Continue';
+  if(cCurrent === 4){
+    const swl = document.querySelector('[data-cert-step="3"] input[type=text]').value;
+    const unit = document.querySelector('[data-cert-step="3"] select').value;
+    document.getElementById('reviewSWL').textContent = swl ? `${swl} ${unit}` : '—';
+  }
+}
+
+certStepperItems.forEach(s => s.addEventListener('click', () => {
+  const n = +s.dataset.step;
+  if(n <= furthestStep){ cCurrent = n; renderCert(); }
+}));
+certBack.addEventListener('click', () => { if(cCurrent>1){ cCurrent--; renderCert(); }});
+certNext.addEventListener('click', () => {
+  if(!validateCurrentStep()) return;
+  if(cCurrent < 4){ 
+    cCurrent++; 
+    if(cCurrent > furthestStep) furthestStep = cCurrent;
+    renderCert(); 
+  } else { 
+    showToast('Certificate generated');
+    setTimeout(() => {
+      cCurrent = 1;
+      furthestStep = 1;
+      renderCert();
+      goView('detail');
+    }, 1000);
+  }
+});
+renderCert();
+
+// rte placeholder toggle
+document.querySelectorAll('.rte-body').forEach(el => {
+  el.addEventListener('input', () => {
+    el.setAttribute('data-empty', el.textContent.trim() === '' ? 'true' : 'false');
+    if(el.textContent.trim() !== '') el.closest('.rte').classList.remove('input-error');
+  });
+});
+
+// clear error state as required fields are filled in
+document.querySelectorAll('input[required], textarea[required]').forEach(el => {
+  el.addEventListener('input', () => el.classList.remove('input-error'));
+});
+
+// ---------- Clients & Dynamic Pagination ----------
+const clients = [
+  { name:null, company:'PT. Valmet Technology Center', email:'test@gmail.com', phone:null },
+  { name:null, company:'Sumber Mega Jaya', email:'indoveritas_255590...@placeholder.local', phone:null },
+  { name:'Linda', company:'Spanset Indonesia', email:'armand.z@spanset.co.id', phone:'+6281927607791' },
+  { name:'Mike Tyson', company:'Test', email:'indoveritas_255590...@placeholder.local', phone:null },
+  { name:'Citra', company:'Surabaya Express', email:'indoveritas_255590...@placeholder.local', phone:'+6282245996373' },
+  { name:'Budi Santoso', company:'PT. Tripatra Engineering', email:'budi.s@tripatra.com', phone:'+628111223344' },
+  { name:'Ahmad Dahlan', company:'PT. Badak NGL', email:'ahmad.d@badakngl.co.id', phone:'+628123456789' },
+  { name:null, company:'PT. Pertamina Hulu Energi', email:'contact@phe.pertamina.com', phone:null },
+  { name:'Siti Rahma', company:'PT. Adaro Energy', email:'siti.r@adaro.com', phone:'+6281399887766' },
+  { name:'Eko Prasetyo', company:'PT. Medco Energi', email:'eko.p@medcoenergi.com', phone:'+6281555443322' },
+  { name:'Dewi Lestari', company:'PT. Bukit Asam', email:'dewi.l@ptba.co.id', phone:'+6281777889900' },
+  { name:'Hendra Gunawan', company:'PT. Elnusa Tbk', email:'hendra.g@elnusa.co.id', phone:'+6281800112233' },
+  { name:null, company:'PT. Apexindo Pratama Duta', email:'info@apexindo.com', phone:null },
+  { name:'Rina Wijaya', company:'PT. Saka Energi Indonesia', email:'rina.w@sakaenergi.com', phone:'+6281911223344' },
+  { name:'Agus Setiawan', company:'PT. Timah Tbk', email:'agus.s@timah.co.id', phone:'+6281299001122' }
+];
+
+for(let i = 16; i <= 65; i++) {
+  clients.push({
+    name: i % 3 === 0 ? null : `Client ${i}`,
+    company: `PT. Example Enterprise ${i}`,
+    email: `client${i}@example.com`,
+    phone: i % 2 === 0 ? `+628123456${i.toString().padStart(2, '0')}` : null
+  });
+}
+
+let currentPage = 1;
+let pageSize = 10;
+
+function initials(str){
+  return str.split(' ').filter(Boolean).slice(0,2).map(s=>s[0].toUpperCase()).join('');
+}
+
+function onClientFilterChange() {
+  currentPage = 1;
+  toggleClearBtn('clientSearch');
+  renderClientsTable();
+}
+
+function clearClientSearch(){
+  const input = document.getElementById('clientSearch');
+  input.value = '';
+  onClientFilterChange();
+  input.focus();
+}
+
+function renderClientsTable() {
+  const cBody = document.getElementById('clientsBody');
+  cBody.innerHTML = '';
+  
+  const searchVal = (document.getElementById('clientSearch')?.value || '').toLowerCase().trim();
+  
+  // Filter clients based on search input
+  const filteredClients = clients.filter(c => {
+    if (!searchVal) return true;
+    const nameMatch = c.name && c.name.toLowerCase().includes(searchVal);
+    const companyMatch = c.company && c.company.toLowerCase().includes(searchVal);
+    const emailMatch = c.email && c.email.toLowerCase().includes(searchVal);
+    return nameMatch || companyMatch || emailMatch;
+  });
+
+  const total = filteredClients.length;
+  document.getElementById('totalClientsLabel').textContent = `${clients.length} clients`;
+  clientSummaryText = document.getElementById('totalClientsLabel').textContent;
+  if(document.querySelector('.view.active')?.dataset.view === 'clients'){
+    document.getElementById('crumb').innerHTML = '<b>' + clientSummaryText + '</b>';
+  }
+  
+  const effPageSize = pageSize === 'all' ? total : parseInt(pageSize);
+  const totalPages = pageSize === 'all' ? 1 : Math.ceil(total / effPageSize) || 1;
+  
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+  
+  const startIdx = (currentPage - 1) * effPageSize;
+  const endIdx = pageSize === 'all' ? total : Math.min(startIdx + effPageSize, total);
+  
+  const visibleClients = filteredClients.slice(startIdx, endIdx);
+  
+  if (visibleClients.length === 0) {
+    cBody.innerHTML = `
+      <tr>
+        <td colspan="4" style="text-align: center; color: var(--muted); padding: 24px;">
+          No clients found matching your search.
+        </td>
+      </tr>
+    `;
+  } else {
+    visibleClients.forEach(c => {
+      const tr = document.createElement('tr');
+      const displayName = c.name || null;
+      tr.innerHTML = `
+        <td><div class="client-name-cell"><span class="client-avatar">${initials(displayName || c.company)}</span>${displayName ? displayName : '<span class="muted-italic">No name provided</span>'}</div></td>
+        <td>${c.company}</td>
+        <td class="mono-cell">${c.email}</td>
+        <td>${c.phone ? c.phone : '<span class="muted-italic">—</span>'}</td>
+      `;
+      cBody.appendChild(tr);
+    });
+  }
+  
+  document.getElementById('paginationInfo').textContent = total > 0 
+    ? `Showing ${startIdx + 1}–${endIdx} of ${total}` 
+    : 'No clients to display';
+    
+  renderPaginationControls(totalPages);
+}
+
+function renderPaginationControls(totalPages) {
+  const pc = document.getElementById('pageControls');
+  pc.innerHTML = '';
+  
+  if (totalPages <= 1) return;
+  
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'page-btn';
+  prevBtn.textContent = '‹';
+  prevBtn.disabled = currentPage === 1;
+  prevBtn.onclick = () => { if(currentPage > 1) { currentPage--; renderClientsTable(); } };
+  pc.appendChild(prevBtn);
+  
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+      const pageBtn = document.createElement('button');
+      pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+      pageBtn.textContent = i;
+      pageBtn.onclick = () => { currentPage = i; renderClientsTable(); };
+      pc.appendChild(pageBtn);
+    } else if (
+      (i === 2 && currentPage > 3) || 
+      (i === totalPages - 1 && currentPage < totalPages - 2)
+    ) {
+      const ellipsis = document.createElement('span');
+      ellipsis.style.cssText = 'padding:0 2px;color:var(--muted);font-size:12px;';
+      ellipsis.textContent = '…';
+      pc.appendChild(ellipsis);
+    }
+  }
+  
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'page-btn';
+  nextBtn.textContent = '›';
+  nextBtn.disabled = currentPage === totalPages;
+  nextBtn.onclick = () => { if(currentPage < totalPages) { currentPage++; renderClientsTable(); } };
+  pc.appendChild(nextBtn);
+}
+
+function changePageSize(value) {
+  pageSize = value;
+  currentPage = 1;
+  renderClientsTable();
+}
+
+renderClientsTable();
+</script>
+</body>
+</html>
