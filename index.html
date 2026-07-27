@@ -207,6 +207,7 @@
   .status-dot.in_review{ background:#ffc107; }
   .status-dot.approved{ background:var(--navy-soft2); }
   .status-dot.issued{ background:var(--teal); }
+  .status-dot.none { background: #CBD2DB; }
   .status-filter-popover-actions{ display:flex; justify-content:space-between; gap:8px; margin-top:8px; padding-top:8px; border-top:1px solid var(--line); }
 
   @media (max-width:640px){
@@ -571,7 +572,7 @@
           <div class="toolbar-row">
             <div class="status-filter-picker" id="statusFilterPicker">
               <button type="button" class="status-filter-btn" id="statusFilterBtn" onclick="toggleStatusFilterPopover(event)">
-                <span id="statusFilterLabel">All statuses</span>
+                <span id="statusFilterLabel">All status</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
               </button>
               <div class="status-filter-popover" id="statusFilterPopover">
@@ -591,6 +592,10 @@
                   <input type="checkbox" value="issued" onchange="onStatusFilterChange()">
                   <span class="status-dot issued"></span> Issued
                 </label>
+                <label class="status-filter-option">
+    <input type="checkbox" value="none" onchange="onStatusFilterChange()">
+    <span class="status-dot none"></span> No Certificate
+  </label>
                 <div class="status-filter-popover-actions">
                   <button type="button" class="btn btn--ghost btn--sm" onclick="clearStatusFilter()">Clear</button>
                   <button type="button" class="btn btn--primary btn--sm" onclick="closeStatusFilterPopover()">Done</button>
@@ -1082,7 +1087,7 @@ function showToast(msg){
 }
 
 // ---------- Status labels/colors (shared) ----------
-const STATUS_LABELS = { draft:'Draft', in_review:'In Review', approved:'Approved', issued:'Issued' };
+const STATUS_LABELS = { none: 'No Certificate', draft:'Draft', in_review:'In Review', approved:'Approved', issued:'Issued' };
 const STATUS_ORDER = ['issued','approved','in_review','draft']; // most-advanced first, used for the card accent color
 
 function statusBadgesHtml(statuses){
@@ -1170,7 +1175,7 @@ function updateStatusFilterLabel(){
   const btn = document.getElementById('statusFilterBtn');
   const label = document.getElementById('statusFilterLabel');
   if(selectedStatusFilters.length === 0){
-    label.textContent = 'All statuses';
+    label.textContent = 'All status';
     btn.classList.remove('has-value');
   } else if(selectedStatusFilters.length === 1){
     label.textContent = STATUS_LABELS[selectedStatusFilters[0]];
@@ -1296,22 +1301,31 @@ function renderAppointments() {
   const startVal = document.getElementById('apptStartDate').value;
   const endVal = document.getElementById('apptEndDate').value;
 
-  // Filter
-  let filtered = appts.filter(a => {
-    const matchesFilter = selectedStatusFilters.length === 0 || a.certStatuses.some(s => selectedStatusFilters.includes(s));
-    const matchesSearch = !searchVal || 
-      a.client.toLowerCase().includes(searchVal) || 
-      a.code.toLowerCase().includes(searchVal) || 
-      a.scope.toLowerCase().includes(searchVal);
-    let matchesDate = true;
-    if (startVal || endVal) {
-      const apptDate = parseScheduleDate(a.when);
-      const apptDateOnly = new Date(apptDate.getFullYear(), apptDate.getMonth(), apptDate.getDate());
-      if (startVal) matchesDate = matchesDate && apptDateOnly >= new Date(startVal + 'T00:00:00');
-      if (endVal) matchesDate = matchesDate && apptDateOnly <= new Date(endVal + 'T00:00:00');
+// Filter appointments
+let filtered = appts.filter(a => {
+  // Updated status matching logic:
+  const matchesFilter = selectedStatusFilters.length === 0 || selectedStatusFilters.some(filterVal => {
+    if (filterVal === 'none') {
+      return !a.certStatuses || a.certStatuses.length === 0;
     }
-    return matchesFilter && matchesSearch && matchesDate;
+    return a.certStatuses && a.certStatuses.includes(filterVal);
   });
+
+  const matchesSearch = !searchVal || 
+    a.client.toLowerCase().includes(searchVal) || 
+    a.code.toLowerCase().includes(searchVal) || 
+    a.scope.toLowerCase().includes(searchVal);
+
+  let matchesDate = true;
+  if (startVal || endVal) {
+    const apptDate = parseScheduleDate(a.when);
+    const apptDateOnly = new Date(apptDate.getFullYear(), apptDate.getMonth(), apptDate.getDate());
+    if (startVal) matchesDate = matchesDate && apptDateOnly >= new Date(startVal + 'T00:00:00');
+    if (endVal) matchesDate = matchesDate && apptDateOnly <= new Date(endVal + 'T00:00:00');
+  }
+
+  return matchesFilter && matchesSearch && matchesDate;
+});
 
   // Update summary header label — counts appointments containing each certificate status
   const countByStatus = (key) => appts.filter(a => a.certStatuses.includes(key)).length;
