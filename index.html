@@ -129,6 +129,8 @@
   .btn--primary:hover{ background:var(--navy-soft); }
   .btn--ghost{ background:var(--card); color:var(--ink); border-color:var(--line-strong); }
   .btn--ghost:hover{ border-color:var(--navy-soft2); }
+  .btn--danger{ background:var(--card); color:var(--red); border-color:var(--red); }
+  .btn--danger:hover{ background:var(--red-bg); }
   .btn--sm{ padding:7px 12px; font-size:12.5px; }
   .btn[disabled]{ opacity:.45; cursor:not-allowed; }
 
@@ -157,8 +159,6 @@
     background:var(--card); font-size:12px; font-weight:500; color:var(--muted); cursor:pointer; white-space:nowrap;
   }
   .chip.active{ background:var(--navy); border-color:var(--navy); color:#fff; }
-  .chip[data-filter="pending"].active{ background:#ffc107; border-color:#ffc107; color:var(--amber-dark); }
-  .chip[data-filter="issued"].active{ background:var(--teal-bg); border-color:var(--teal-bg); color:#fff; }
   .select-input{
     padding:9px 10px; border:1px solid var(--line-strong); border-radius:6px; font-size:12.5px; color:var(--muted); background:var(--card);
     flex:none; width:140px;
@@ -181,10 +181,41 @@
   .date-range-popover .field label{ font-size:11.5px; margin-bottom:4px; }
   .date-range-popover-actions{ display:flex; justify-content:space-between; gap:8px; margin-top:2px; }
 
+  /* ===== Status filter dropdown ===== */
+  .status-filter-picker{ position:relative; flex:none; }
+  .status-filter-btn{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:9px 10px; border:1px solid var(--line-strong); border-radius:6px; font-size:12.5px;
+    color:var(--muted); background:var(--card); width:190px; cursor:pointer;
+  }
+  .status-filter-btn svg{ flex:none; opacity:.6; }
+  .status-filter-btn.has-value{ color:var(--ink); border-color:var(--navy-soft2); }
+  .status-filter-popover{
+    display:none; position:absolute; top:calc(100% + 6px); right:0; z-index:20;
+    background:var(--card); border:1px solid var(--line-strong); border-radius:8px;
+    box-shadow:var(--shadow-md); padding:12px; width:200px;
+  }
+  .status-filter-popover.open{ display:block; }
+  .status-filter-option{
+    display:flex; align-items:center; gap:9px; padding:7px 4px; font-size:13px; font-weight:500;
+    color:var(--ink); cursor:pointer; border-radius:5px;
+  }
+  .status-filter-option:hover{ background:var(--paper); }
+  .status-filter-option input{ width:auto; margin:0; accent-color:var(--navy); }
+  .status-dot{ width:9px; height:9px; border-radius:50%; display:inline-block; flex:none; }
+  .status-dot.draft{ background:#9AA5B1; }
+  .status-dot.in_review{ background:#ffc107; }
+  .status-dot.approved{ background:var(--navy-soft2); }
+  .status-dot.issued{ background:var(--teal); }
+  .status-filter-popover-actions{ display:flex; justify-content:space-between; gap:8px; margin-top:8px; padding-top:8px; border-top:1px solid var(--line); }
+
   @media (max-width:640px){
     .date-range-picker{ width:100%; }
     .date-range-btn{ width:100%; }
     .date-range-popover{ left:0; right:0; width:auto; }
+    .status-filter-picker{ width:100%; }
+    .status-filter-btn{ width:100%; }
+    .status-filter-popover{ left:0; right:0; width:auto; }
     .select-input{ flex:1; width:auto; }
   }
 
@@ -204,7 +235,9 @@
     content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--line-strong);
   }
   .appt-card.status-issued:before{ background:var(--teal); }
-  .appt-card.status-pending:before{ background:var(--amber); }
+  .appt-card.status-approved:before{ background:var(--navy-soft2); }
+  .appt-card.status-in_review:before{ background:var(--amber); }
+  .appt-card.status-draft:before{ background:#9AA5B1; }
   .appt-card-main{ flex:1; min-width:0; }
   .appt-top-row{ display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap; }
   .mono-chip{
@@ -216,6 +249,11 @@
   }
   .status-pill.issued{ background:var(--teal-bg); color:#fff; }
   .status-pill.pending{ background:#ffc107; color:var(--amber-dark); }
+  .status-pill.draft{ background:var(--line); color:var(--muted); }
+  .status-pill.in_review{ background:#ffc107; color:var(--amber-dark); }
+  .status-pill.approved{ background:var(--navy-soft2); color:#fff; }
+  .status-pill.none{ background:var(--paper); color:var(--muted); border:1px dashed var(--line-strong); }
+  .appt-status-badges{ display:flex; gap:6px; flex-wrap:wrap; }
   .appt-client{ font-family:var(--font-display); font-size:15.5px; font-weight:700; margin:2px 0 4px; }
   .appt-scope{ font-size:13px; color:var(--muted); margin:0 0 10px; max-width:640px; }
   .appt-scope .more{ color:var(--navy-soft2); font-weight:600; cursor:pointer; }
@@ -325,6 +363,73 @@
   .review-item{ padding:10px 0; border-bottom:1px solid var(--line); }
   .review-item label{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:600; margin-bottom:3px; }
   .review-item div{ font-size:13.5px; }
+
+  /* ===== Yes/No toggle fields ===== */
+  .yn-toggle{ display:flex; gap:8px; }
+  .yn-btn{
+    padding:8px 16px; border:1px solid var(--line-strong); border-radius:6px; background:var(--card);
+    font-size:12.5px; font-weight:600; color:var(--muted); cursor:pointer;
+  }
+  .yn-btn:hover{ border-color:var(--navy-soft2); }
+  .yn-btn.selected{ background:var(--navy); border-color:var(--navy); color:#fff; }
+  .yn-btn.selected[data-val="no"]{ background:var(--red); border-color:var(--red); }
+  .yn-toggle.input-error .yn-btn{ border-color:var(--red); }
+  .field[data-disabled="true"]{ opacity:.45; pointer-events:none; }
+  .conditional-field{ margin-top:10px; }
+
+  .field-note{ font-size:12px; color:var(--muted); background:var(--paper); border-radius:6px; padding:8px 10px; margin:0 0 12px; }
+
+  /* ===== Review step: grouped sections ===== */
+  .review-section{ margin-bottom:18px; }
+  .review-section:last-child{ margin-bottom:0; }
+  .review-section-title{
+    font-family:var(--font-display); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--navy-soft2); margin:0 0 10px; padding-bottom:8px; border-bottom:1px solid var(--line);
+  }
+
+  /* ===== Certificate workflow cards (list inside appointment detail) ===== */
+  .cert-list{ display:flex; flex-direction:column; gap:10px; }
+  .cert-card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:16px 18px;
+  }
+  .cert-card-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+  .cert-card-id{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .cert-card-equip{ font-size:12.5px; color:var(--muted); margin:4px 0 0; }
+
+  .cert-progress{ display:flex; align-items:center; margin:12px 0; }
+  .cert-progress-step{ display:flex; align-items:center; flex:1; }
+  .cert-progress-step:last-child{ flex:none; }
+  .cert-progress-dot{
+    width:20px; height:20px; border-radius:50%; border:2px solid var(--line-strong); background:var(--card);
+    display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--muted); flex:none;
+    font-family:var(--font-mono);
+  }
+  .cert-progress-line{ flex:1; height:2px; background:var(--line-strong); margin:0 4px; }
+  .cert-progress-step.done .cert-progress-dot{ background:var(--teal); border-color:var(--teal); color:#fff; }
+  .cert-progress-step.done .cert-progress-line{ background:var(--teal); }
+  .cert-progress-step.current .cert-progress-dot{ background:var(--navy); border-color:var(--navy); color:#fff; }
+  .cert-progress-labels{ display:flex; justify-content:space-between; font-size:10.5px; color:var(--muted); margin-top:4px; }
+
+  .cert-card-actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+
+  /* ===== Modal ===== */
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(16,24,40,0.5); z-index:60;
+    align-items:flex-start; justify-content:center; overflow-y:auto; padding:40px 20px;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal-card{
+    background:var(--card); border-radius:10px; max-width:640px; width:100%; box-shadow:var(--shadow-md);
+    padding:0; max-height:calc(100vh - 80px); display:flex; flex-direction:column;
+  }
+  .modal-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:18px 22px; border-bottom:1px solid var(--line); }
+  .modal-head h3{ font-family:var(--font-display); font-size:16px; margin:0 0 3px; }
+  .modal-head p{ margin:0; font-size:12.5px; color:var(--muted); }
+  .modal-close{ border:none; background:none; cursor:pointer; color:var(--muted); padding:4px; border-radius:5px; flex:none; }
+  .modal-close:hover{ background:var(--paper); color:var(--ink); }
+  .modal-body{ padding:20px 22px; overflow-y:auto; }
+  .modal-foot{ padding:14px 22px; border-top:1px solid var(--line); display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap; }
 
   .footer-nav{
     position:sticky; bottom:0; background:var(--card); border-top:1px solid var(--line);
@@ -464,10 +569,33 @@
             </div>
           </div>
           <div class="toolbar-row">
-            <div class="chip-row">
-              <button class="chip active" data-filter="all" onclick="setApptFilter('all', this)">All</button>
-              <button class="chip" data-filter="pending" onclick="setApptFilter('pending', this)">Awaiting certificate</button>
-              <button class="chip" data-filter="issued" onclick="setApptFilter('issued', this)">Certificate issued</button>
+            <div class="status-filter-picker" id="statusFilterPicker">
+              <button type="button" class="status-filter-btn" id="statusFilterBtn" onclick="toggleStatusFilterPopover(event)">
+                <span id="statusFilterLabel">All statuses</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="status-filter-popover" id="statusFilterPopover">
+                <label class="status-filter-option">
+                  <input type="checkbox" value="draft" onchange="onStatusFilterChange()">
+                  <span class="status-dot draft"></span> Draft
+                </label>
+                <label class="status-filter-option">
+                  <input type="checkbox" value="in_review" onchange="onStatusFilterChange()">
+                  <span class="status-dot in_review"></span> In Review
+                </label>
+                <label class="status-filter-option">
+                  <input type="checkbox" value="approved" onchange="onStatusFilterChange()">
+                  <span class="status-dot approved"></span> Approved
+                </label>
+                <label class="status-filter-option">
+                  <input type="checkbox" value="issued" onchange="onStatusFilterChange()">
+                  <span class="status-dot issued"></span> Issued
+                </label>
+                <div class="status-filter-popover-actions">
+                  <button type="button" class="btn btn--ghost btn--sm" onclick="clearStatusFilter()">Clear</button>
+                  <button type="button" class="btn btn--primary btn--sm" onclick="closeStatusFilterPopover()">Done</button>
+                </div>
+              </div>
             </div>
 
             <select class="select-input" id="apptSortSelect" onchange="onApptFilterChange()">
@@ -547,14 +675,14 @@
           <div class="detail-grid">
             <div class="detail-field"><label>Schedule</label><div>Tue, 21 Jul 2026 · 15:01 – 08:34</div></div>
             <div class="detail-field"><label>Personnel</label><div>Muhamad Farhan</div></div>
-            <div class="detail-field"><label>Status</label><div><span class="status-pill pending">Awaiting certificate</span></div></div>
+            <div class="detail-field"><label>Status</label><div class="appt-status-badges" id="detailStatusBadges"></div></div>
           </div>
         </div>
 
         <div class="section-head">
           <h2>Certificates</h2>
           <div class="section-head-actions">
-            <button class="btn btn--primary btn--sm" onclick="goView('certificate')">+ Add Certificate</button>
+            <button class="btn btn--primary btn--sm" onclick="startNewCertificate()">+ Add Certificate</button>
             <button class="btn btn--ghost btn--sm" onclick="showToast('Job sheet generated')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>
               Generate Job Sheet
@@ -570,11 +698,13 @@
           </div>
         </div>
 
-        <div class="empty-state">
+        <div class="empty-state" id="certEmptyState">
           <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>
           <p>No certificates yet for this appointment.<br>Create one to generate the inspection report.</p>
-          <button class="btn btn--primary" onclick="goView('certificate')">+ Create first certificate</button>
+          <button class="btn btn--primary" onclick="startNewCertificate()">+ Create first certificate</button>
         </div>
+
+        <div class="cert-list" id="certList"></div>
       </section>
 
       <!-- VIEW: CERTIFICATE WIZARD -->
@@ -585,7 +715,7 @@
         </span>
         <div class="page-head">
           <div>
-            <h1>Certificate <span class="before-tag">4 focused steps · was 1 long scroll</span></h1>
+            <h1>Certificate <span class="before-tag">6 focused steps · matches Certificate of Thorough Examination</span></h1>
             <p>IVG.10/WOD/26/VII/25 · PT. Akura Bina Citra</p>
           </div>
         </div>
@@ -594,8 +724,10 @@
           <ul class="stepper" id="certStepper">
             <li class="active" data-step="1"><div class="step-badge"><span class="step-num">1</span><span class="step-label">Report Details</span></div></li>
             <li data-step="2"><div class="step-badge"><span class="step-num">2</span><span class="step-label">Equipment</span></div></li>
-            <li data-step="3"><div class="step-badge"><span class="step-num">3</span><span class="step-label">Load &amp; Specs</span></div></li>
-            <li data-step="4"><div class="step-badge"><span class="step-num">4</span><span class="step-label">Review &amp; Generate</span></div></li>
+            <li data-step="3"><div class="step-badge"><span class="step-num">3</span><span class="step-label">Examination</span></div></li>
+            <li data-step="4"><div class="step-badge"><span class="step-num">4</span><span class="step-label">Findings &amp; Tests</span></div></li>
+            <li data-step="5"><div class="step-badge"><span class="step-num">5</span><span class="step-label">Sign-off</span></div></li>
+            <li data-step="6"><div class="step-badge"><span class="step-num">6</span><span class="step-label">Review &amp; Generate</span></div></li>
           </ul>
         </div>
 
@@ -605,93 +737,230 @@
             <div class="field-grid">
               <div class="field">
                 <label>Date of thorough examination <span class="req">*</span></label>
-                <input type="date" value="2026-07-21" required>
+                <input type="date" id="f_dateOfExam" value="2026-07-21" required>
               </div>
               <div class="field">
                 <label>Date of report <span class="req">*</span></label>
-                <input type="date" value="2026-07-21" required>
+                <input type="date" id="f_dateOfReport" value="2026-07-21" required>
               </div>
               <div class="field">
                 <label>Report number</label>
-                <input type="text" value="IVG.10/WOD/26/VII/25" readonly>
+                <input type="text" id="f_reportNumber" value="IVG.10/WOD/26/VII/25" readonly>
                 <p class="helper">Generated automatically from the appointment code.</p>
               </div>
               <div class="field span-2">
                 <label>Name and address of employer <span class="req">*</span></label>
                 <p class="helper">The customer or company that requested this inspection.</p>
-                <textarea placeholder="e.g. PT. Akura Bina Citra&#10;Gedung 123 Jalan XYZ No.1, Kota Jakarta" required></textarea>
+                <textarea id="f_employerAddress" placeholder="e.g. PT. Akura Bina Citra&#10;Gedung 123 Jalan XYZ No.1, Kota Jakarta" required>PT. Akura Bina Citra
+Gedung 123 Jalan XYZ No.1, Kota Jakarta</textarea>
               </div>
               <div class="field span-2">
                 <label>Address of premises where examination was made <span class="req">*</span></label>
                 <p class="helper">The site or warehouse where the equipment was physically inspected.</p>
-                <textarea placeholder="e.g. Warehouse PT XYZ, Bekasi" required></textarea>
+                <textarea id="f_premisesAddress" placeholder="e.g. Warehouse PT XYZ, Bekasi" required></textarea>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- STEP 2 -->
+        <!-- STEP 2: Equipment -->
         <div class="cert-step" data-cert-step="2">
           <div class="card">
             <div class="field-grid">
               <div class="field span-2">
-                <label>Description and identification of the equipment <span class="req">*</span></label>
-                <p class="helper">Include equipment type, manufacturer, model, capacity and serial number.</p>
-                <div class="rte">
-                  <div class="rte-toolbar">
-                    <button type="button" onclick="document.execCommand('bold')"><b>B</b></button>
-                    <button type="button" onclick="document.execCommand('italic')"><i>I</i></button>
-                    <button type="button" class="u" onclick="document.execCommand('underline')">U</button>
-                  </div>
-                  <div class="rte-body" contenteditable="true" data-placeholder="Mobile Crane — Manufacturer: XXX, Model: XXX, Max Capacity: XXX, Serial Number: XXX" data-empty="true"></div>
+                <label>Equipment type / description <span class="req">*</span></label>
+                <p class="helper">e.g. Excavator, Mobile Crane, Wire Rope Sling, Air Reservoir Tank.</p>
+                <input type="text" id="f_equipType" placeholder="e.g. Excavator" required>
+              </div>
+              <div class="field">
+                <label>Manufacturer</label>
+                <input type="text" id="f_equipManufacturer" placeholder="e.g. Kobelco">
+              </div>
+              <div class="field">
+                <label>Model <span class="req">*</span></label>
+                <input type="text" id="f_equipModel" placeholder="e.g. SK200-10" required>
+              </div>
+              <div class="field">
+                <label>Engine model</label>
+                <input type="text" id="f_equipEngineModel" placeholder="e.g. HINO J05ETA-KSSE">
+              </div>
+              <div class="field">
+                <label>Rated power</label>
+                <input type="text" id="f_equipRatedPower" placeholder="e.g. 118 kW/2,000 min">
+              </div>
+              <div class="field">
+                <label>Serial number <span class="req">*</span></label>
+                <input type="text" id="f_equipSerial" placeholder="e.g. YN15425423" required>
+              </div>
+              <div class="field">
+                <label>Max capacity <span class="req">*</span></label>
+                <div class="unit-field">
+                  <input type="text" id="f_equipMaxCapacity" placeholder="e.g. 27700" required>
+                  <select id="f_equipMaxCapacityUnit"><option>Kg</option><option>tonne</option><option>lbs</option></select>
                 </div>
-                <p class="example">Example: Mobile Crane · Manufacturer: XXX · Model: XXX · Max Capacity: XXX · Serial Number: XXX</p>
+              </div>
+              <div class="field">
+                <label>Date of manufacture (if known)</label>
+                <input type="date" id="f_equipManufactureDate">
+              </div>
+              <div class="field">
+                <label>Date of last thorough examination</label>
+                <input type="date" id="f_equipLastExamDate">
+                <p class="helper">Leave blank and check the box below if this is the first examination.</p>
+                <label style="display:flex;align-items:center;gap:7px;font-weight:500;font-size:12.5px;margin-top:4px;">
+                  <input type="checkbox" id="f_equipNoPriorExam" style="width:auto;" onchange="document.getElementById('f_equipLastExamDate').disabled=this.checked; if(this.checked) document.getElementById('f_equipLastExamDate').value='';">
+                  N/A — no prior examination on record
+                </label>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- STEP 3 -->
+        <!-- STEP 3: Examination & Compliance -->
         <div class="cert-step" data-cert-step="3">
           <div class="card">
             <div class="field-grid">
-              <div class="field">
-                <label>Safe working load <span class="req">*</span></label>
-                <div class="unit-field">
-                  <input type="text" placeholder="e.g. 10" required>
-                  <select><option>tonne</option><option>kg</option><option>lbs</option></select>
+              <div class="field span-2">
+                <label>Reference / regulation <span class="req">*</span></label>
+                <p class="helper">The statutory scheme this examination is carried out under.</p>
+                <textarea id="f_reference" required>Permenaker Nomor 8 Tahun 2020 Keselamatan dan Kesehatan Kerja Pesawat Angkat dan Pesawat Angkut</textarea>
+              </div>
+            </div>
+            <p class="field-note" style="margin-top:14px;">These questions come directly from the statutory Certificate of Thorough Examination and determine what appears in the compliance table.</p>
+            <div class="field-grid">
+              <div class="field span-2">
+                <label>Is this the first examination after installation or assembly at a new site or location? <span class="req">*</span></label>
+                <div class="yn-toggle" data-required="true" data-field="ynFirstExam">
+                  <button type="button" class="yn-btn" data-val="yes" onclick="setYN(this, true, 'wrap_ynInstalledCorrectly')">Yes</button>
+                  <button type="button" class="yn-btn" data-val="no" onclick="setYN(this, true, 'wrap_ynInstalledCorrectly')">No</button>
+                </div>
+              </div>
+              <div class="field span-2 conditional-field" id="wrap_ynInstalledCorrectly" data-disabled="true">
+                <label>If yes, has the equipment been installed correctly?</label>
+                <div class="yn-toggle" data-field="ynInstalledCorrectly">
+                  <button type="button" class="yn-btn" data-val="yes" onclick="setYN(this)">Yes</button>
+                  <button type="button" class="yn-btn" data-val="no" onclick="setYN(this)">No</button>
                 </div>
               </div>
               <div class="field">
-                <label>Date of manufacture <span class="req">*</span></label>
-                <input type="date" value="2026-07-21" required>
+                <label>Carried out within an interval of 6 months? <span class="req">*</span></label>
+                <div class="yn-toggle" data-required="true" data-field="ynInterval6">
+                  <button type="button" class="yn-btn" data-val="yes" onclick="setYN(this, true)">Yes</button>
+                  <button type="button" class="yn-btn" data-val="no" onclick="setYN(this, true)">No</button>
+                </div>
               </div>
               <div class="field">
-                <label>Serial number</label>
-                <input type="text" placeholder="e.g. YN15T19008">
+                <label>Carried out within an interval of 12 months? <span class="req">*</span></label>
+                <div class="yn-toggle" data-required="true" data-field="ynInterval12">
+                  <button type="button" class="yn-btn" data-val="yes" onclick="setYN(this, true)">Yes</button>
+                  <button type="button" class="yn-btn" data-val="no" onclick="setYN(this, true)">No</button>
+                </div>
               </div>
               <div class="field">
-                <label>Max lifting capacity</label>
-                <input type="text" placeholder="e.g. 8000 kg">
+                <label>In accordance with an examination scheme? <span class="req">*</span></label>
+                <div class="yn-toggle" data-required="true" data-field="ynScheme">
+                  <button type="button" class="yn-btn" data-val="yes" onclick="setYN(this, true)">Yes</button>
+                  <button type="button" class="yn-btn" data-val="no" onclick="setYN(this, true)">No</button>
+                </div>
+              </div>
+              <div class="field">
+                <label>After the occurrence of exceptional circumstances? <span class="req">*</span></label>
+                <div class="yn-toggle" data-required="true" data-field="ynExceptional">
+                  <button type="button" class="yn-btn" data-val="yes" onclick="setYN(this, true)">Yes</button>
+                  <button type="button" class="yn-btn" data-val="no" onclick="setYN(this, true)">No</button>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- STEP 4 -->
+        <!-- STEP 4: Findings & Tests -->
         <div class="cert-step" data-cert-step="4">
           <div class="card">
-            <div class="prefill-note" style="font-size:12px;color:var(--muted);background:var(--paper);border-radius:6px;padding:9px 12px;margin-bottom:14px;">
-              Review the details below before generating the certificate. You can go back to any step to make changes.
+            <div class="field-grid">
+              <div class="field span-2">
+                <label>Identification of any part found to have a defect which is or could become a danger to persons <span class="req">*</span></label>
+                <p class="helper">If none, state "None".</p>
+                <textarea id="f_defect" required>None</textarea>
+              </div>
+              <div class="field">
+                <label>Is the above a defect which is of immediate danger to persons? <span class="req">*</span></label>
+                <div class="yn-toggle" data-required="true" data-field="ynImmediateDanger">
+                  <button type="button" class="yn-btn" data-val="yes" onclick="setYN(this, true)">Yes</button>
+                  <button type="button" class="yn-btn" data-val="no" onclick="setYN(this, true)">No</button>
+                </div>
+              </div>
+              <div class="field">
+                <label>Is it a defect which is not yet, but could become, a danger to persons? <span class="req">*</span></label>
+                <div class="yn-toggle" data-required="true" data-field="ynFutureDanger">
+                  <button type="button" class="yn-btn" data-val="yes" onclick="setYN(this, true, 'wrap_futureDangerDate')">Yes</button>
+                  <button type="button" class="yn-btn" data-val="no" onclick="setYN(this, true, 'wrap_futureDangerDate')">No</button>
+                </div>
+              </div>
+              <div class="field conditional-field" id="wrap_futureDangerDate" data-disabled="true">
+                <label>If yes, state the date by when</label>
+                <input type="date" id="f_futureDangerDate">
+              </div>
+              <div class="field span-2">
+                <label>Particulars of any repair, renewal or alteration required to remedy the defect identified above</label>
+                <textarea id="f_repairParticulars">None</textarea>
+              </div>
+              <div class="field span-2">
+                <label>Particulars of any tests carried out as part of the examination</label>
+                <p class="helper">If none, state "None".</p>
+                <textarea id="f_testsParticulars" placeholder="e.g. NDT Report No. IVG.02/IRP/26/VI/078">None</textarea>
+              </div>
+              <div class="field span-2">
+                <label>Is this equipment fit for purpose? <span class="req">*</span></label>
+                <div class="yn-toggle" data-required="true" data-field="ynFitForPurpose">
+                  <button type="button" class="yn-btn" data-val="yes" onclick="setYN(this, true)">Yes</button>
+                  <button type="button" class="yn-btn" data-val="no" onclick="setYN(this, true)">No</button>
+                </div>
+              </div>
             </div>
-            <div class="review-grid">
-              <div class="review-item"><label>Report number</label><div>IVG.10/WOD/26/VII/25</div></div>
-              <div class="review-item"><label>Date of examination</label><div>21 July 2026</div></div>
-              <div class="review-item"><label>Employer</label><div>PT. Akura Bina Citra</div></div>
-              <div class="review-item"><label>Premises</label><div>Warehouse PT XYZ, Bekasi</div></div>
-              <div class="review-item"><label>Safe working load</label><div id="reviewSWL">—</div></div>
-              <div class="review-item"><label>Date of manufacture</label><div>21 July 2026</div></div>
+          </div>
+        </div>
+
+        <!-- STEP 5: Sign-off -->
+        <div class="cert-step" data-cert-step="5">
+          <div class="card">
+            <div class="field-grid">
+              <div class="field">
+                <label>Name of person making this report <span class="req">*</span></label>
+                <input type="text" id="f_reporterName" placeholder="e.g. Agus Sulparman" required>
+              </div>
+              <div class="field">
+                <label>Qualification of person making this report <span class="req">*</span></label>
+                <input type="text" id="f_reporterQualification" placeholder="e.g. AK3PAPA 5/13594/AS.01.04/VII/2025" required>
+              </div>
+              <div class="field">
+                <label>Name of person authenticating this report <span class="req">*</span></label>
+                <input type="text" id="f_authenticatorName" placeholder="e.g. Armand Zachary" required>
+              </div>
+              <div class="field">
+                <label>Title of person authenticating this report <span class="req">*</span></label>
+                <input type="text" id="f_authenticatorTitle" value="Director" required>
+              </div>
+              <div class="field">
+                <label>Latest date by which next thorough examination must be carried out <span class="req">*</span></label>
+                <input type="date" id="f_nextExamDate" required>
+              </div>
+              <div class="field">
+                <label>Employer of persons making &amp; authenticating this report</label>
+                <input type="text" id="f_reportingCompany" value="PT Indo Veritas Grup" readonly>
+              </div>
             </div>
+            <p class="field-note" style="margin-top:14px;">Both names appear on the certificate as digital signatures once the certificate is approved and issued — no separate signing step is required outside this workflow.</p>
+          </div>
+        </div>
+
+        <!-- STEP 6: Review & Generate -->
+        <div class="cert-step" data-cert-step="6">
+          <div class="card">
+            <div class="prefill-note" style="font-size:12px;color:var(--muted);background:var(--paper);border-radius:6px;padding:9px 12px;margin-bottom:16px;">
+              Review the details below before generating the certificate. Generating creates a <b>draft</b> — it still needs to be reviewed, approved, and issued before it can be downloaded.
+            </div>
+            <div id="reviewContent"></div>
           </div>
         </div>
 
@@ -750,6 +1019,22 @@
 
 <div class="toast-stack" id="toastStack"></div>
 
+<div class="modal-overlay" id="certModalOverlay" onclick="if(event.target===this) closeCertModal()">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <h3 id="certModalTitle">Certificate</h3>
+        <p id="certModalSubtitle">—</p>
+      </div>
+      <button class="modal-close" onclick="closeCertModal()" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="certModalBody"></div>
+    <div class="modal-foot" id="certModalFoot"></div>
+  </div>
+</div>
+
 <script>
 // ---------- Nav / view switching ----------
 const crumbTitles = { detail:'Service Appointments <span style="opacity:.4">/</span> Appointment Details', certificate:'Service Appointments <span style="opacity:.4">/</span> Certificate' };
@@ -765,6 +1050,7 @@ function goView(name){
   } else {
     document.getElementById('crumb').innerHTML = '<b>' + crumbTitles[name] + '</b>';
   }
+  if(name === 'detail'){ renderDetailStatusBadges(); }
   window.scrollTo({top:0, behavior:'smooth'});
 }
 document.querySelectorAll('.nav-item').forEach(n => n.addEventListener('click', () => { goView(n.dataset.nav); closeMobileMenu(); }));
@@ -795,14 +1081,45 @@ function showToast(msg){
   setTimeout(() => { el.style.opacity='0'; el.style.transition='opacity .25s'; setTimeout(()=>el.remove(),250); }, 2600);
 }
 
+// ---------- Status labels/colors (shared) ----------
+const STATUS_LABELS = { draft:'Draft', in_review:'In Review', approved:'Approved', issued:'Issued' };
+const STATUS_ORDER = ['issued','approved','in_review','draft']; // most-advanced first, used for the card accent color
+
+function statusBadgesHtml(statuses){
+  if(!statuses || statuses.length === 0){
+    return `<span class="status-pill none">No certificate</span>`;
+  }
+  return statuses.map(s => `<span class="status-pill ${s}">${STATUS_LABELS[s]}</span>`).join('');
+}
+function mostAdvancedStatus(statuses){
+  if(!statuses || statuses.length === 0) return 'none';
+  for(const s of STATUS_ORDER){ if(statuses.includes(s)) return s; }
+  return statuses[0];
+}
+
 // ---------- Appointments Dataset ----------
 const baseAppts = [
-  { code:'IVG.10/WOD/26/VII/25', client:'PT. Akura Bina Citra', scope:'SO-IVG2026070030 — Explosive Bunker Primary, Secondary, Fishing Box, Radioactive Bunker, Doghouse, Rig Up Equipment, Slings/Belts, Safety Harness', when:'Tue, 21 Jul 2026 · 15:01–08:34', personnel:['MF'], status:'pending' },
-  { code:'IVG.10/WOD/26/VII/24', client:'PT. Gunanusa Utama Fabricators', scope:'SO-IVG2026070029 — Recertification of air reservoir tank (pressure vessel), load test skid/frame of the reservoir tank', when:'Tue, 21 Jul 2026 · 08:14', personnel:['AN'], status:'pending' },
-  { code:'IVG.10/WOD/26/VII/19', client:'PT. Nusa Halmahera Minerals', scope:'3rd Party Inspection — Main Rope & Guide Rope (Visual, NDT)', when:'Fri, 17 Jul 2026 · 14:43', personnel:['IS','AZ'], status:'issued' },
-  { code:'IVG.10/WOD/26/VII/23', client:'PT. Meindo Elang Indah', scope:'DISNAKER Certification for Excavator Standard Arm MEI-EXC-075 SN YN15T19008', when:'Fri, 17 Jul 2026 · 13:05–15:43', personnel:['MF','AN'], status:'issued' },
-  { code:'IVG.10/WOD/26/VII/21', client:'PT. Oil Spill Combat Team', scope:'Periodic Inspection — Sling Set cw Shackle 4 Leg Wirerope Sling w/Shackle 5/8"', when:'Fri, 17 Jul 2026 · 10:21', personnel:['IK'], status:'pending' },
-  { code:'IVG.10/WOD/26/VII/20', client:'PT. HYDROCORE', scope:'Inspection — Daily Rate (Wire Rope Sling 26 EA, Shackle 12 EA)', when:'Fri, 17 Jul 2026 · 10:06', personnel:['IK','AN'], status:'issued' },
+  { code:'IVG.10/WOD/26/VII/25', client:'PT. Akura Bina Citra', scope:'SO-IVG2026070030 — Explosive Bunker Primary, Secondary, Fishing Box, Radioactive Bunker, Doghouse, Rig Up Equipment, Slings/Belts, Safety Harness', when:'Tue, 21 Jul 2026 · 15:01–08:34', personnel:['MF'] },
+  { code:'IVG.10/WOD/26/VII/24', client:'PT. Gunanusa Utama Fabricators', scope:'SO-IVG2026070029 — Recertification of air reservoir tank (pressure vessel), load test skid/frame of the reservoir tank', when:'Tue, 21 Jul 2026 · 08:14', personnel:['AN'] },
+  { code:'IVG.10/WOD/26/VII/19', client:'PT. Nusa Halmahera Minerals', scope:'3rd Party Inspection — Main Rope & Guide Rope (Visual, NDT)', when:'Fri, 17 Jul 2026 · 14:43', personnel:['IS','AZ'] },
+  { code:'IVG.10/WOD/26/VII/23', client:'PT. Meindo Elang Indah', scope:'DISNAKER Certification for Excavator Standard Arm MEI-EXC-075 SN YN15T19008', when:'Fri, 17 Jul 2026 · 13:05–15:43', personnel:['MF','AN'] },
+  { code:'IVG.10/WOD/26/VII/21', client:'PT. Oil Spill Combat Team', scope:'Periodic Inspection — Sling Set cw Shackle 4 Leg Wirerope Sling w/Shackle 5/8"', when:'Fri, 17 Jul 2026 · 10:21', personnel:['IK'] },
+  { code:'IVG.10/WOD/26/VII/20', client:'PT. HYDROCORE', scope:'Inspection — Daily Rate (Wire Rope Sling 26 EA, Shackle 12 EA)', when:'Fri, 17 Jul 2026 · 10:06', personnel:['IK','AN'] },
+];
+
+// Demo combinations of certificate statuses an appointment can carry — appointments can have
+// zero, one, or multiple certificates in different stages at once.
+const demoStatusCombos = [
+  ['draft'],
+  ['in_review'],
+  ['approved'],
+  ['issued'],
+  ['draft', 'in_review'],
+  ['approved', 'issued'],
+  [],
+  ['draft', 'approved'],
+  ['in_review', 'issued'],
+  ['issued', 'issued'.length ? 'draft' : 'draft'] // keep array length stable; effectively ['issued','draft']
 ];
 
 // Expand dataset to 32 items to demonstrate full pagination
@@ -812,13 +1129,14 @@ for (let i = 0; i < 32; i++) {
   const day = 21 - Math.floor(i / 2);
   const monthStr = 'Jul 2026';
   const hour = String(15 - (i % 8)).padStart(2, '0');
+  const combo = demoStatusCombos[i % demoStatusCombos.length];
   appts.push({
     code: `IVG.10/WOD/26/VII/${String(25 - i).padStart(2, '0')}`,
     client: `${base.client}${i > 5 ? ` (Branch ${Math.floor(i/5)})` : ''}`,
     scope: base.scope,
     when: `Wed, ${day} ${monthStr} · ${hour}:00`,
     personnel: base.personnel,
-    status: i % 3 === 0 ? 'pending' : 'issued'
+    certStatuses: [...new Set(combo)]
   });
 }
 
@@ -838,15 +1156,50 @@ function parseScheduleDate(whenStr) {
 // Appointment Pagination state
 let currentApptPage = 1;
 let apptPageSize = 5;
-let currentApptFilter = 'all';
+let selectedStatusFilters = [];
 
-function setApptFilter(filter, btn) {
-  document.querySelectorAll('.chip-row .chip').forEach(x => x.classList.remove('active'));
-  btn.classList.add('active');
-  currentApptFilter = filter;
+// ---------- Status filter dropdown ----------
+function toggleStatusFilterPopover(e){
+  e.stopPropagation();
+  document.getElementById('statusFilterPopover').classList.toggle('open');
+}
+function closeStatusFilterPopover(){
+  document.getElementById('statusFilterPopover').classList.remove('open');
+}
+function updateStatusFilterLabel(){
+  const btn = document.getElementById('statusFilterBtn');
+  const label = document.getElementById('statusFilterLabel');
+  if(selectedStatusFilters.length === 0){
+    label.textContent = 'All statuses';
+    btn.classList.remove('has-value');
+  } else if(selectedStatusFilters.length === 1){
+    label.textContent = STATUS_LABELS[selectedStatusFilters[0]];
+    btn.classList.add('has-value');
+  } else {
+    label.textContent = `${selectedStatusFilters.length} statuses selected`;
+    btn.classList.add('has-value');
+  }
+}
+function onStatusFilterChange(){
+  selectedStatusFilters = [...document.querySelectorAll('#statusFilterPopover input[type="checkbox"]:checked')].map(el => el.value);
+  updateStatusFilterLabel();
   currentApptPage = 1;
   renderAppointments();
 }
+function clearStatusFilter(){
+  document.querySelectorAll('#statusFilterPopover input[type="checkbox"]').forEach(el => el.checked = false);
+  selectedStatusFilters = [];
+  updateStatusFilterLabel();
+  currentApptPage = 1;
+  renderAppointments();
+}
+document.addEventListener('click', (e) => {
+  const picker = document.getElementById('statusFilterPicker');
+  const popover = document.getElementById('statusFilterPopover');
+  if(picker && popover && !picker.contains(e.target)){
+    popover.classList.remove('open');
+  }
+});
 
 function onApptFilterChange() {
   currentApptPage = 1;
@@ -945,7 +1298,7 @@ function renderAppointments() {
 
   // Filter
   let filtered = appts.filter(a => {
-    const matchesFilter = currentApptFilter === 'all' || a.status === currentApptFilter;
+    const matchesFilter = selectedStatusFilters.length === 0 || a.certStatuses.some(s => selectedStatusFilters.includes(s));
     const matchesSearch = !searchVal || 
       a.client.toLowerCase().includes(searchVal) || 
       a.code.toLowerCase().includes(searchVal) || 
@@ -960,10 +1313,9 @@ function renderAppointments() {
     return matchesFilter && matchesSearch && matchesDate;
   });
 
-  // Update summary header label
-  const pendingCount = appts.filter(a => a.status === 'pending').length;
-  const issuedCount = appts.filter(a => a.status === 'issued').length;
-  apptSummaryText = `${appts.length} appointments · ${pendingCount} awaiting certificate · ${issuedCount} issued`;
+  // Update summary header label — counts appointments containing each certificate status
+  const countByStatus = (key) => appts.filter(a => a.certStatuses.includes(key)).length;
+  apptSummaryText = `${appts.length} appointments · ${countByStatus('draft')} draft · ${countByStatus('in_review')} in review · ${countByStatus('approved')} approved · ${countByStatus('issued')} issued`;
   if(document.querySelector('.view.active')?.dataset.view === 'appointments'){
     document.getElementById('crumb').innerHTML = '<b>' + apptSummaryText + '</b>';
   }
@@ -998,13 +1350,13 @@ function renderAppointments() {
   } else {
     visibleAppts.forEach(a => {
       const div = document.createElement('div');
-      div.className = 'appt-card status-' + a.status;
+      div.className = 'appt-card status-' + mostAdvancedStatus(a.certStatuses);
       div.onclick = () => goView('detail');
       div.innerHTML = `
         <div class="appt-card-main">
           <div class="appt-top-row">
             <span class="mono-chip">${a.code}</span>
-            <span class="status-pill ${a.status}">${a.status === 'issued' ? 'Certificate issued' : 'Awaiting certificate'}</span>
+            <div class="appt-status-badges">${statusBadgesHtml(a.certStatuses)}</div>
           </div>
           <div class="appt-client">${a.client}</div>
           <p class="appt-scope" data-code="${a.code}" data-expanded="false">${a.scope.slice(0,110)}${a.scope.length>110 ? '… <span class="more" onclick="toggleScope(event,this)">Show more</span>' : ''}</p>
@@ -1016,7 +1368,7 @@ function renderAppointments() {
         <div class="appt-side" onclick="event.stopPropagation()">
           <div class="appt-actions">
             <button class="btn btn--ghost btn--sm" onclick="showToast('QR code generated')">QR Code</button>
-            <button class="btn btn--primary btn--sm" onclick="goView('certificate')">${a.status==='issued' ? 'View Certificate' : 'Create Certificate'}</button>
+            <button class="btn btn--primary btn--sm" onclick="goView('certificate')">${a.certStatuses.length > 0 ? 'View Certificates' : 'Create Certificate'}</button>
           </div>
         </div>
       `;
@@ -1030,6 +1382,13 @@ function renderAppointments() {
     : 'No appointments to display';
 
   renderApptPaginationControls(totalPages);
+}
+
+function renderDetailStatusBadges(){
+  const el = document.getElementById('detailStatusBadges');
+  if(!el) return;
+  const statuses = [...new Set(certificates.map(c => c.status))];
+  el.innerHTML = statusBadgesHtml(statuses);
 }
 
 function renderApptPaginationControls(totalPages) {
@@ -1081,8 +1440,31 @@ const certSteps = [...document.querySelectorAll('.cert-step')];
 const certStepperItems = [...document.querySelectorAll('#certStepper li')];
 const certBack = document.getElementById('certBack');
 const certNext = document.getElementById('certNext');
+const CERT_TOTAL_STEPS = certSteps.length;
 let cCurrent = 1;
 let furthestStep = 1;
+
+// Yes/No toggle handling. `required` marks it for step validation.
+// `conditionalWrapId`, if given, is a field wrapper enabled only when this toggle is "yes".
+function setYN(btn, required, conditionalWrapId){
+  const group = btn.parentElement;
+  group.querySelectorAll('.yn-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  group.classList.remove('input-error');
+  if(conditionalWrapId){
+    const wrap = document.getElementById(conditionalWrapId);
+    const enable = btn.dataset.val === 'yes';
+    wrap.dataset.disabled = enable ? 'false' : 'true';
+    if(!enable){ wrap.querySelectorAll('input,textarea').forEach(el => el.value = ''); }
+  }
+}
+function getYN(field){
+  const btn = document.querySelector(`.yn-toggle[data-field="${field}"] .yn-btn.selected`);
+  return btn ? btn.dataset.val : null;
+}
+
+// wire up conditional enabling for "first examination" -> "installed correctly"
+document.addEventListener('DOMContentLoaded', () => {});
 
 function validateCurrentStep(){
   const stepEl = document.querySelector(`[data-cert-step="${cCurrent}"]`);
@@ -1091,6 +1473,7 @@ function validateCurrentStep(){
   let firstInvalid = null;
 
   stepEl.querySelectorAll('input[required], textarea[required]').forEach(el => {
+    if(el.disabled) return;
     if(!el.value || !el.value.trim()){
       valid = false;
       el.classList.add('input-error');
@@ -1100,23 +1483,94 @@ function validateCurrentStep(){
     }
   });
 
-  const rte = stepEl.querySelector('.rte-body');
-  if(rte){
-    const rteWrap = rte.closest('.rte');
-    if(rte.textContent.trim() === ''){
+  stepEl.querySelectorAll('.yn-toggle[data-required="true"]').forEach(group => {
+    const wrap = group.closest('[data-disabled="true"]');
+    if(wrap) return; // skip toggles inside a currently-disabled conditional field
+    if(!group.querySelector('.yn-btn.selected')){
       valid = false;
-      rteWrap.classList.add('input-error');
-      if(!firstInvalid) firstInvalid = rte;
+      group.classList.add('input-error');
+      if(!firstInvalid) firstInvalid = group;
     } else {
-      rteWrap.classList.remove('input-error');
+      group.classList.remove('input-error');
     }
-  }
+  });
 
   if(!valid){
     showToast('Please fill in the required fields before continuing');
-    if(firstInvalid) firstInvalid.focus();
+    if(firstInvalid && firstInvalid.focus) firstInvalid.focus();
   }
   return valid;
+}
+
+function fieldVal(id){
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+function ynLabel(field){
+  const v = getYN(field);
+  return v ? (v === 'yes' ? 'Yes' : 'No') : '—';
+}
+function fmtDate(dStr){
+  if(!dStr) return '—';
+  const d = new Date(dStr + 'T00:00:00');
+  return d.toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' });
+}
+
+function renderReviewStep(){
+  const cap = fieldVal('f_equipMaxCapacity');
+  const capUnit = document.getElementById('f_equipMaxCapacityUnit').value;
+  document.getElementById('reviewContent').innerHTML = `
+    <div class="review-section">
+      <div class="review-section-title">Report Details</div>
+      <div class="review-grid">
+        <div class="review-item"><label>Report number</label><div>${fieldVal('f_reportNumber')}</div></div>
+        <div class="review-item"><label>Date of examination</label><div>${fmtDate(fieldVal('f_dateOfExam'))}</div></div>
+        <div class="review-item"><label>Date of report</label><div>${fmtDate(fieldVal('f_dateOfReport'))}</div></div>
+        <div class="review-item"><label>Employer</label><div>${fieldVal('f_employerAddress') || '—'}</div></div>
+        <div class="review-item"><label>Premises examined</label><div>${fieldVal('f_premisesAddress') || '—'}</div></div>
+      </div>
+    </div>
+    <div class="review-section">
+      <div class="review-section-title">Equipment</div>
+      <div class="review-grid">
+        <div class="review-item"><label>Type</label><div>${fieldVal('f_equipType') || '—'}</div></div>
+        <div class="review-item"><label>Manufacturer / Model</label><div>${fieldVal('f_equipManufacturer') || '—'} ${fieldVal('f_equipModel')}</div></div>
+        <div class="review-item"><label>Serial number</label><div>${fieldVal('f_equipSerial') || '—'}</div></div>
+        <div class="review-item"><label>Max capacity</label><div>${cap ? cap + ' ' + capUnit : '—'}</div></div>
+        <div class="review-item"><label>Date of manufacture</label><div>${fmtDate(fieldVal('f_equipManufactureDate'))}</div></div>
+        <div class="review-item"><label>Date of last examination</label><div>${document.getElementById('f_equipNoPriorExam').checked ? 'N/A — first examination' : fmtDate(fieldVal('f_equipLastExamDate'))}</div></div>
+      </div>
+    </div>
+    <div class="review-section">
+      <div class="review-section-title">Examination &amp; Compliance</div>
+      <div class="review-grid">
+        <div class="review-item"><label>First examination after install?</label><div>${ynLabel('ynFirstExam')}</div></div>
+        <div class="review-item"><label>Installed correctly?</label><div>${ynLabel('ynInstalledCorrectly')}</div></div>
+        <div class="review-item"><label>Within 6-month interval?</label><div>${ynLabel('ynInterval6')}</div></div>
+        <div class="review-item"><label>Within 12-month interval?</label><div>${ynLabel('ynInterval12')}</div></div>
+        <div class="review-item"><label>Per examination scheme?</label><div>${ynLabel('ynScheme')}</div></div>
+        <div class="review-item"><label>After exceptional circumstances?</label><div>${ynLabel('ynExceptional')}</div></div>
+      </div>
+    </div>
+    <div class="review-section">
+      <div class="review-section-title">Findings &amp; Tests</div>
+      <div class="review-grid">
+        <div class="review-item"><label>Defect identified</label><div>${fieldVal('f_defect') || 'None'}</div></div>
+        <div class="review-item"><label>Immediate danger?</label><div>${ynLabel('ynImmediateDanger')}</div></div>
+        <div class="review-item"><label>Could become a danger?</label><div>${ynLabel('ynFutureDanger')}</div></div>
+        <div class="review-item"><label>Tests carried out</label><div>${fieldVal('f_testsParticulars') || 'None'}</div></div>
+        <div class="review-item"><label>Fit for purpose?</label><div>${ynLabel('ynFitForPurpose')}</div></div>
+      </div>
+    </div>
+    <div class="review-section">
+      <div class="review-section-title">Sign-off</div>
+      <div class="review-grid">
+        <div class="review-item"><label>Prepared by</label><div>${fieldVal('f_reporterName') || '—'}</div></div>
+        <div class="review-item"><label>Authenticated by</label><div>${fieldVal('f_authenticatorName') || '—'} · ${fieldVal('f_authenticatorTitle')}</div></div>
+        <div class="review-item"><label>Next examination due</label><div>${fmtDate(fieldVal('f_nextExamDate'))}</div></div>
+      </div>
+    </div>
+  `;
 }
 
 function renderCert(){
@@ -1129,11 +1583,9 @@ function renderCert(){
     s.style.cursor = n <= furthestStep ? 'pointer' : 'not-allowed';
   });
   certBack.disabled = cCurrent === 1;
-  certNext.textContent = cCurrent === 4 ? 'Generate certificate' : 'Continue';
-  if(cCurrent === 4){
-    const swl = document.querySelector('[data-cert-step="3"] input[type=text]').value;
-    const unit = document.querySelector('[data-cert-step="3"] select').value;
-    document.getElementById('reviewSWL').textContent = swl ? `${swl} ${unit}` : '—';
+  certNext.textContent = cCurrent === CERT_TOTAL_STEPS ? 'Generate certificate (draft)' : 'Continue';
+  if(cCurrent === CERT_TOTAL_STEPS){
+    renderReviewStep();
   }
 }
 
@@ -1144,34 +1596,351 @@ certStepperItems.forEach(s => s.addEventListener('click', () => {
 certBack.addEventListener('click', () => { if(cCurrent>1){ cCurrent--; renderCert(); }});
 certNext.addEventListener('click', () => {
   if(!validateCurrentStep()) return;
-  if(cCurrent < 4){ 
-    cCurrent++; 
+  if(cCurrent < CERT_TOTAL_STEPS){
+    cCurrent++;
     if(cCurrent > furthestStep) furthestStep = cCurrent;
-    renderCert(); 
-  } else { 
-    showToast('Certificate generated');
-    setTimeout(() => {
-      cCurrent = 1;
-      furthestStep = 1;
-      renderCert();
-      goView('detail');
-    }, 1000);
+    renderCert();
+  } else {
+    generateCertificateDraft();
   }
 });
 renderCert();
-
-// rte placeholder toggle
-document.querySelectorAll('.rte-body').forEach(el => {
-  el.addEventListener('input', () => {
-    el.setAttribute('data-empty', el.textContent.trim() === '' ? 'true' : 'false');
-    if(el.textContent.trim() !== '') el.closest('.rte').classList.remove('input-error');
-  });
-});
 
 // clear error state as required fields are filled in
 document.querySelectorAll('input[required], textarea[required]').forEach(el => {
   el.addEventListener('input', () => el.classList.remove('input-error'));
 });
+
+function resetCertWizard(){
+  cCurrent = 1;
+  furthestStep = 1;
+  document.querySelectorAll('.cert-step .input-error').forEach(el => el.classList.remove('input-error'));
+  renderCert();
+}
+function startNewCertificate(){
+  resetCertWizard();
+  goView('certificate');
+}
+
+// ---------- Certificate workflow: Draft → In Review → Approved → Issued ----------
+const CERT_STAGES = [
+  { key:'draft',     label:'Create' },
+  { key:'in_review',  label:'Review' },
+  { key:'approved',   label:'Approval' },
+  { key:'issued',     label:'Issued' }
+];
+let certificates = [];
+let certAutoId = 1;
+let editingCertId = null;
+
+// Captures every wizard field (raw yes/no values included) so an edited certificate
+// can be fully restored into the form later.
+function collectFormData(){
+  return {
+    dateOfExam: fieldVal('f_dateOfExam'),
+    dateOfReport: fieldVal('f_dateOfReport'),
+    employerAddress: fieldVal('f_employerAddress'),
+    premisesAddress: fieldVal('f_premisesAddress'),
+    equipType: fieldVal('f_equipType'),
+    equipManufacturer: fieldVal('f_equipManufacturer'),
+    equipModel: fieldVal('f_equipModel'),
+    equipEngineModel: fieldVal('f_equipEngineModel'),
+    equipRatedPower: fieldVal('f_equipRatedPower'),
+    equipSerial: fieldVal('f_equipSerial'),
+    equipMaxCapacity: fieldVal('f_equipMaxCapacity'),
+    equipMaxCapacityUnit: document.getElementById('f_equipMaxCapacityUnit').value,
+    equipManufactureDate: fieldVal('f_equipManufactureDate'),
+    equipLastExamDate: fieldVal('f_equipLastExamDate'),
+    equipNoPriorExam: document.getElementById('f_equipNoPriorExam').checked,
+    reference: fieldVal('f_reference'),
+    ynFirstExam: getYN('ynFirstExam'),
+    ynInstalledCorrectly: getYN('ynInstalledCorrectly'),
+    ynInterval6: getYN('ynInterval6'),
+    ynInterval12: getYN('ynInterval12'),
+    ynScheme: getYN('ynScheme'),
+    ynExceptional: getYN('ynExceptional'),
+    defect: fieldVal('f_defect'),
+    ynImmediateDanger: getYN('ynImmediateDanger'),
+    ynFutureDanger: getYN('ynFutureDanger'),
+    futureDangerDate: fieldVal('f_futureDangerDate'),
+    repairParticulars: fieldVal('f_repairParticulars'),
+    testsParticulars: fieldVal('f_testsParticulars'),
+    ynFitForPurpose: getYN('ynFitForPurpose'),
+    reporterName: fieldVal('f_reporterName'),
+    reporterQualification: fieldVal('f_reporterQualification'),
+    authenticatorName: fieldVal('f_authenticatorName'),
+    authenticatorTitle: fieldVal('f_authenticatorTitle'),
+    nextExamDate: fieldVal('f_nextExamDate')
+  };
+}
+
+// Sets a yes/no toggle group to a stored value and re-enables/disables its conditional field.
+function setYNValue(field, val, conditionalWrapId){
+  const group = document.querySelector(`.yn-toggle[data-field="${field}"]`);
+  if(!group) return;
+  group.querySelectorAll('.yn-btn').forEach(b => b.classList.remove('selected'));
+  if(val){
+    const btn = group.querySelector(`.yn-btn[data-val="${val}"]`);
+    if(btn) btn.classList.add('selected');
+  }
+  if(conditionalWrapId){
+    const wrap = document.getElementById(conditionalWrapId);
+    if(wrap) wrap.dataset.disabled = (val === 'yes') ? 'false' : 'true';
+  }
+}
+
+// Repopulates every wizard field from a previously-saved certificate's data.
+function applyFormData(data){
+  document.getElementById('f_dateOfExam').value = data.dateOfExam || '';
+  document.getElementById('f_dateOfReport').value = data.dateOfReport || '';
+  document.getElementById('f_employerAddress').value = data.employerAddress || '';
+  document.getElementById('f_premisesAddress').value = data.premisesAddress || '';
+  document.getElementById('f_equipType').value = data.equipType || '';
+  document.getElementById('f_equipManufacturer').value = data.equipManufacturer || '';
+  document.getElementById('f_equipModel').value = data.equipModel || '';
+  document.getElementById('f_equipEngineModel').value = data.equipEngineModel || '';
+  document.getElementById('f_equipRatedPower').value = data.equipRatedPower || '';
+  document.getElementById('f_equipSerial').value = data.equipSerial || '';
+  document.getElementById('f_equipMaxCapacity').value = data.equipMaxCapacity || '';
+  document.getElementById('f_equipMaxCapacityUnit').value = data.equipMaxCapacityUnit || 'Kg';
+  document.getElementById('f_equipManufactureDate').value = data.equipManufactureDate || '';
+  document.getElementById('f_equipNoPriorExam').checked = !!data.equipNoPriorExam;
+  document.getElementById('f_equipLastExamDate').disabled = !!data.equipNoPriorExam;
+  document.getElementById('f_equipLastExamDate').value = data.equipNoPriorExam ? '' : (data.equipLastExamDate || '');
+  document.getElementById('f_reference').value = data.reference || '';
+  setYNValue('ynFirstExam', data.ynFirstExam, 'wrap_ynInstalledCorrectly');
+  setYNValue('ynInstalledCorrectly', data.ynInstalledCorrectly);
+  setYNValue('ynInterval6', data.ynInterval6);
+  setYNValue('ynInterval12', data.ynInterval12);
+  setYNValue('ynScheme', data.ynScheme);
+  setYNValue('ynExceptional', data.ynExceptional);
+  document.getElementById('f_defect').value = data.defect || '';
+  setYNValue('ynImmediateDanger', data.ynImmediateDanger);
+  setYNValue('ynFutureDanger', data.ynFutureDanger, 'wrap_futureDangerDate');
+  document.getElementById('f_futureDangerDate').value = data.futureDangerDate || '';
+  document.getElementById('f_repairParticulars').value = data.repairParticulars || '';
+  document.getElementById('f_testsParticulars').value = data.testsParticulars || '';
+  setYNValue('ynFitForPurpose', data.ynFitForPurpose);
+  document.getElementById('f_reporterName').value = data.reporterName || '';
+  document.getElementById('f_reporterQualification').value = data.reporterQualification || '';
+  document.getElementById('f_authenticatorName').value = data.authenticatorName || '';
+  document.getElementById('f_authenticatorTitle').value = data.authenticatorTitle || '';
+  document.getElementById('f_nextExamDate').value = data.nextExamDate || '';
+}
+
+function updateWizardHeading(){
+  const el = document.getElementById('certWizardHeading');
+  if(el) el.textContent = editingCertId ? 'Edit Certificate' : 'Certificate';
+}
+
+function generateCertificateDraft(){
+  const data = collectFormData();
+
+  if(editingCertId){
+    const c = findCert(editingCertId);
+    if(c){
+      c.equipType = data.equipType || 'Equipment';
+      c.equipModel = data.equipModel;
+      c.data = data;
+      showToast('Certificate updated');
+    }
+    editingCertId = null;
+    setTimeout(() => {
+      resetCertWizard();
+      goView('detail');
+      renderCertList();
+    }, 600);
+    return;
+  }
+
+  const cert = {
+    id: certAutoId++,
+    reportNumber: fieldVal('f_reportNumber'),
+    equipType: data.equipType || 'Equipment',
+    equipModel: data.equipModel,
+    status: 'draft',
+    createdAt: data.dateOfReport,
+    data
+  };
+  certificates.unshift(cert);
+  showToast('Certificate created as draft');
+  setTimeout(() => {
+    resetCertWizard();
+    goView('detail');
+    renderCertList();
+  }, 700);
+}
+
+function stageIndex(status){ return CERT_STAGES.findIndex(s => s.key === status); }
+
+function renderCertList(){
+  const listEl = document.getElementById('certList');
+  const emptyEl = document.getElementById('certEmptyState');
+  renderDetailStatusBadges();
+  if(!listEl) return;
+  if(certificates.length === 0){
+    emptyEl.style.display = '';
+    listEl.innerHTML = '';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  listEl.innerHTML = certificates.map(c => {
+    const idx = stageIndex(c.status);
+    const progressHtml = CERT_STAGES.map((s, i) => `
+      <div class="cert-progress-step ${i < idx ? 'done' : ''} ${i === idx ? 'current' : ''}">
+        <div class="cert-progress-dot">${i < idx ? '✓' : i+1}</div>
+        ${i < CERT_STAGES.length - 1 ? '<div class="cert-progress-line"></div>' : ''}
+      </div>
+    `).join('');
+    const labelsHtml = CERT_STAGES.map(s => `<span>${s.label}</span>`).join('');
+
+    let actions = '';
+    if(c.status === 'draft'){
+      actions = `
+        <button class="btn btn--ghost btn--sm" onclick="viewCertificate(${c.id})">View</button>
+        <button class="btn btn--danger btn--sm" onclick="deleteCertificate(${c.id})">Delete Certificate</button>
+        <button class="btn btn--primary btn--sm" onclick="submitForReview(${c.id})">Submit for Review</button>`;
+    } else if(c.status === 'in_review'){
+      actions = `
+        <button class="btn btn--ghost btn--sm" onclick="viewCertificate(${c.id})">View</button>
+        <button class="btn btn--ghost btn--sm" onclick="sendBackToDraft(${c.id})">Send back to draft</button>
+        <button class="btn btn--danger btn--sm" onclick="deleteCertificate(${c.id})">Delete Certificate</button>
+        <button class="btn btn--primary btn--sm" onclick="approveCertificate(${c.id})">Approve</button>`;
+    } else if(c.status === 'approved'){
+      actions = `
+        <button class="btn btn--ghost btn--sm" onclick="viewCertificate(${c.id})">View</button>
+        <button class="btn btn--ghost btn--sm" onclick="sendBackToReview(${c.id})">Back to Review</button>
+        <button class="btn btn--danger btn--sm" onclick="deleteCertificate(${c.id})">Delete Certificate</button>
+        <button class="btn btn--primary btn--sm" onclick="issueCertificate(${c.id})">Issue Certificate</button>`;
+    } else if(c.status === 'issued'){
+      actions = `
+        <button class="btn btn--ghost btn--sm" onclick="viewCertificate(${c.id})">View Certificate</button>
+        <button class="btn btn--danger btn--sm" onclick="deleteCertificate(${c.id})">Delete Certificate</button>
+        <button class="btn btn--primary btn--sm" onclick="downloadCertificate(${c.id})">Download PDF</button>`;
+    }
+
+    return `
+      <div class="cert-card">
+        <div class="cert-card-top">
+          <div class="cert-card-id">
+            <span class="mono-chip">${c.reportNumber}</span>
+            <span class="status-pill ${c.status}">${STATUS_LABELS[c.status]}</span>
+          </div>
+        </div>
+        <p class="cert-card-equip">${c.equipType}${c.equipModel ? ' · ' + c.equipModel : ''}</p>
+        <div class="cert-progress">${progressHtml}</div>
+        <div class="cert-progress-labels">${labelsHtml}</div>
+        <div class="cert-card-actions" style="margin-top:14px;">${actions}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function findCert(id){ return certificates.find(c => c.id === id); }
+
+function submitForReview(id){
+  const c = findCert(id); if(!c) return;
+  c.status = 'in_review';
+  renderCertList();
+  showToast('Certificate submitted for review');
+}
+function sendBackToDraft(id){
+  const c = findCert(id); if(!c) return;
+  c.status = 'draft';
+  renderCertList();
+  showToast('Certificate sent back to draft');
+}
+function approveCertificate(id){
+  const c = findCert(id); if(!c) return;
+  c.status = 'approved';
+  renderCertList();
+  showToast('Certificate approved');
+}
+function sendBackToReview(id){
+  const c = findCert(id); if(!c) return;
+  c.status = 'in_review';
+  renderCertList();
+  showToast('Certificate sent back to review');
+}
+function issueCertificate(id){
+  const c = findCert(id); if(!c) return;
+  c.status = 'issued';
+  renderCertList();
+  showToast('Certificate issued');
+}
+function downloadCertificate(id){
+  const c = findCert(id); if(!c) return;
+  showToast('Certificate PDF downloaded');
+}
+function deleteCertificate(id){
+  const c = findCert(id); if(!c) return;
+  if(!window.confirm(`Delete certificate ${c.reportNumber}? This cannot be undone.`)) return;
+  certificates = certificates.filter(x => x.id !== id);
+  renderCertList();
+  showToast('Certificate deleted');
+}
+
+// ---------- Certificate preview modal ----------
+function ynDataLabel(v){ return v ? (v === 'yes' ? 'Yes' : 'No') : '—'; }
+
+function viewCertificate(id){
+  const c = findCert(id); if(!c) return;
+  const d = c.data;
+  document.getElementById('certModalTitle').textContent = c.reportNumber;
+  document.getElementById('certModalSubtitle').textContent = `${c.equipType}${c.equipModel ? ' · ' + c.equipModel : ''} · ${STATUS_LABELS[c.status]}`;
+  document.getElementById('certModalBody').innerHTML = `
+    <div class="review-grid">
+      <div class="review-item"><label>Date of examination</label><div>${fmtDate(d.dateOfExam)}</div></div>
+      <div class="review-item"><label>Date of report</label><div>${fmtDate(d.dateOfReport)}</div></div>
+      <div class="review-item"><label>Employer</label><div>${d.employerAddress || '—'}</div></div>
+      <div class="review-item"><label>Premises examined</label><div>${d.premisesAddress || '—'}</div></div>
+      <div class="review-item"><label>Manufacturer</label><div>${d.equipManufacturer || '—'}</div></div>
+      <div class="review-item"><label>Serial number</label><div>${d.equipSerial || '—'}</div></div>
+      <div class="review-item"><label>Max capacity</label><div>${d.equipMaxCapacity ? d.equipMaxCapacity + ' ' + (d.equipMaxCapacityUnit || '') : '—'}</div></div>
+      <div class="review-item"><label>Fit for purpose</label><div>${ynDataLabel(d.ynFitForPurpose)}</div></div>
+      <div class="review-item"><label>Prepared by</label><div>${d.reporterName || '—'}</div></div>
+      <div class="review-item"><label>Authenticated by</label><div>${d.authenticatorName || '—'} · ${d.authenticatorTitle || ''}</div></div>
+      <div class="review-item"><label>Next examination due</label><div>${fmtDate(d.nextExamDate)}</div></div>
+    </div>
+  `;
+  let footActions = `<button class="btn btn--ghost btn--sm" onclick="closeCertModal()">Close</button>`;
+  footActions += `<button class="btn btn--ghost btn--sm" onclick="editCertificate(${c.id})">Edit</button>`;
+  footActions += `<button class="btn btn--danger btn--sm" onclick="deleteCertificate(${c.id}); closeCertModal();">Delete Certificate</button>`;
+  if(c.status === 'draft'){
+    footActions += `<button class="btn btn--primary btn--sm" onclick="submitForReview(${c.id}); closeCertModal();">Submit for Review</button>`;
+  } else if(c.status === 'in_review'){
+    footActions += `<button class="btn btn--primary btn--sm" onclick="approveCertificate(${c.id}); closeCertModal();">Approve</button>`;
+  } else if(c.status === 'approved'){
+    footActions += `<button class="btn btn--ghost btn--sm" onclick="sendBackToReview(${c.id}); closeCertModal();">Back to Review</button>`;
+    footActions += `<button class="btn btn--primary btn--sm" onclick="issueCertificate(${c.id}); closeCertModal();">Issue Certificate</button>`;
+  } else if(c.status === 'issued'){
+    footActions += `<button class="btn btn--primary btn--sm" onclick="downloadCertificate(${c.id})">Download PDF</button>`;
+  }
+  document.getElementById('certModalFoot').innerHTML = footActions;
+  document.getElementById('certModalOverlay').classList.add('open');
+}
+function closeCertModal(){
+  document.getElementById('certModalOverlay').classList.remove('open');
+}
+
+// Opens the wizard again pre-filled with an existing certificate's data, so it can be edited
+// and re-generated in place rather than creating a duplicate.
+function editCertificate(id){
+  const c = findCert(id); if(!c) return;
+  editingCertId = id;
+  closeCertModal();
+  document.getElementById('f_reportNumber').value = c.reportNumber;
+  applyFormData(c.data);
+  cCurrent = 1;
+  furthestStep = CERT_TOTAL_STEPS;
+  document.querySelectorAll('.cert-step .input-error').forEach(el => el.classList.remove('input-error'));
+  renderCert();
+  updateWizardHeading();
+  goView('certificate');
+  showToast('Editing certificate — make your changes, then generate again to save');
+}
+
+renderCertList();
 
 // ---------- Clients & Dynamic Pagination ----------
 const clients = [
